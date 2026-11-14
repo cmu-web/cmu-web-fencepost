@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Google tag (Google Analytics): docs pages only, never in API or MCP responses -->
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-PKL3STCZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference - FencePost - Carnegie Mellon University</title>
+    <meta name="description" content="FencePost's API, MCP tools and the sites it captures." />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,600,700,700italic"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://www.cmu.edu/common/standard-v6/css/main.6.7.min.css"
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.7/css/cmu-cms.css"
+      integrity="sha384-9jhXiuuhmbvQJYP71Rg8e7/NBlfXA/7MjHSMxZeSbELc/fdpt3PAwyoS4jvEMXqy"
+      crossorigin="anonymous"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link href="//www.cmu.edu/favicon.ico" rel="icon" />
+    <link href="//www.cmu.edu/favicon-152.png" rel="apple-touch-icon-precomposed" />
+    <meta content="#9f0000" name="msapplication-TileColor" />
+    <meta content="//www.cmu.edu/favicon-144.png" name="msapplication-TileImage" />
+  </head>
+  <body class="no-js">
+    <div id="container">
+      <header>
+        <div class="roof red invert">
+          <div>
+            <a class="wordmark" href="https://www.cmu.edu/">Carnegie Mellon University</a>
+            <button aria-label="toggle menu" aria-pressed="false" class="menu-btn" href="#nav"
+              ><b>&#8212;</b><b>&#8212;</b><b>&#8212;</b></button
+            >
+          </div>
+        </div>
+        <div id="sitename">
+          <span class="sitetitle"><a href="./">FencePost</a></span>
+          <h2>Good Previews Make Good Neighbors</h2>
+        </div>
+      </header>
+      <main id="content">
+        <div class="breadcrumbs"><a href="./">FencePost</a>&nbsp;&rsaquo;&nbsp;Reference</div>
+        <div class="content wide">
+          <div>
+            <h1>FencePost Reference</h1>
+            <p class="cmu-lead">
+              Check or make a link preview with the API or an MCP tool call. Both work the same way
+              as the Check and Make pages.
+            </p>
+            <h2 id="sites" class="rule-top">Which Sites It Captures</h2>
+            <p>
+              Any public page on cmu.edu or a domain ending in .cmu.edu, and the Carnegie Mellon
+              domains in <code>domains.json</code>. To add a site that isn't on cmu.edu, use the
+              <a
+                class="external"
+                href="https://github.com/cmu-web/cmu-web-fencepost/issues/new?template=domain_request.yml"
+                >Request a Domain</a
+              >
+              form. FencePost views pages signed out, through public DNS, and refuses private
+              addresses, so a page behind a sign-in or only on campus fails; upload a screenshot
+              instead.
+            </p>
+            <h2 id="api" class="rule-top">API</h2>
+            <p>
+              <code>POST /api/check</code> with JSON: <code>url</code>. It returns what a share
+              would show (title, description, site name and image) and a list of findings, each
+              <code>pass</code>, <code>fix</code> or <code>note</code>.
+            </p>
+            <p>
+              <code>POST /api/preview</code> with JSON: <code>url</code> (required),
+              <code>title</code>, <code>description</code>, <code>site</code>,
+              <code>imagePath</code> (default <code>/images/preview.jpg</code>) and
+              <code>screenshot</code> (base64, skips the capture). It returns the JPEG as base64
+              with the tags. Nothing is stored.
+            </p>
+            <h2 id="mcp" class="rule-top">MCP Tools</h2>
+            <p>
+              The server at <code>https://fencepost.andrew.cmu.edu/mcp</code> (Streamable HTTP, no
+              sign-in) has <code>get_guide</code>, <code>check_link</code> and
+              <code>generate_preview</code>, which take the same fields as the API.
+            </p>
+          </div>
+        </div>
+      </main>
+      <footer class="grid column3 invert">
+        <div>
+          <p
+            >FencePost<br />Carnegie Mellon University<br />5000 Forbes Avenue<br />Pittsburgh, PA
+            15213</p
+          >
+          <ul
+            ><li><a href="https://www.cmu.edu/legal/">Legal Info</a></li
+            ><li><a href="https://www.cmu.edu/">www.cmu.edu</a></li></ul
+          >
+          <ul
+            ><li>&copy; 2026 Carnegie Mellon University</li></ul
+          >
+        </div>
+        <div></div>
+        <div>
+          <nav id="nav"
+            ><ul
+              ><li><a href="check.html">Check</a></li
+              ><li><a href="make.html">Make</a></li
+              ><li class="active"><a href="reference.html" aria-current="page">Reference</a></li
+              ><li><a href="about.html">About</a></li></ul
+            ></nav
+          >
+        </div>
+      </footer>
+    </div>
+    <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js"></script>
+    <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
+    <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.7/js/cmu-app.js"
+      integrity="sha384-10393F76wEQPHaJEEoM9M1QEQsl9mTezDdEM45kArp0j26SWs3gxiGsXKrmwJHio"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+name: Request a Domain
+description: Add a Carnegie Mellon site that isn't on cmu.edu.
+labels: [domain]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        FencePost makes previews for any public page on cmu.edu. Other domains
+        are added for sites run by a Carnegie Mellon department, center, office
+        or recognized student organization.
+  - type: input
+    id: domain
+    attributes:
+      label: Domain
+      description: For example, abtech.org.
+    validations:
+      required: true
+  - type: dropdown
+    id: subdomains
+    attributes:
+      label: Subdomains
+      options:
+        - Just this domain (and www)
+        - This domain and all of its subdomains
+    validations:
+      required: true
+  - type: input
+    id: group
+    attributes:
+      label: Carnegie Mellon Group
+      description: The department, center, office or student organization that runs the site.
+    validations:
+      required: true
+  - type: input
+    id: contact
+    attributes:
+      label: Contact
+      description: A name and Andrew ID we can ask about the site, now and later.
+    validations:
+      required: true
+  - type: textarea
+    id: about
+    attributes:
+      label: About the Site
+      description: What the site is for, with a link.

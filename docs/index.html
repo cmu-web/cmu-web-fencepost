@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Google tag (Google Analytics): docs pages only, never in API or MCP responses -->
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-PKL3STCZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FencePost - Carnegie Mellon University</title>
+    <meta
+      name="description"
+      content="Link previews for Carnegie Mellon websites: the image and the Open Graph tags."
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,600,700,700italic"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://www.cmu.edu/common/standard-v6/css/main.6.7.min.css"
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.7/css/cmu-cms.css"
+      integrity="sha384-9jhXiuuhmbvQJYP71Rg8e7/NBlfXA/7MjHSMxZeSbELc/fdpt3PAwyoS4jvEMXqy"
+      crossorigin="anonymous"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link href="//www.cmu.edu/favicon.ico" rel="icon" />
+    <link href="//www.cmu.edu/favicon-152.png" rel="apple-touch-icon-precomposed" />
+    <meta content="#9f0000" name="msapplication-TileColor" />
+    <meta content="//www.cmu.edu/favicon-144.png" name="msapplication-TileImage" />
+  </head>
+  <body class="no-js">
+    <div id="container">
+      <header>
+        <div class="roof red invert">
+          <div>
+            <a class="wordmark" href="https://www.cmu.edu/">Carnegie Mellon University</a>
+            <button aria-label="toggle menu" aria-pressed="false" class="menu-btn" href="#nav"
+              ><b>&#8212;</b><b>&#8212;</b><b>&#8212;</b></button
+            >
+          </div>
+        </div>
+        <div id="sitename">
+          <span class="sitetitle"><a href="./">FencePost</a></span>
+          <h2>Good Previews Make Good Neighbors</h2>
+        </div>
+      </header>
+      <main id="content">
+        <div class="content wide"
+          ><div>
+            <div class="cmu-hero cmu-hero--blue">
+              <div>
+                <h1>Put Your Best Page Forward</h1>
+                <p class="cmu-lead"
+                  >See how your Carnegie Mellon page looks when someone shares it, then make the
+                  preview image and tags it's missing.</p
+                >
+                <div class="cmu-cta-row">
+                  <a class="btn" href="check.html">Check a Link</a>
+                  <a class="cta" href="#get-started">Get Started</a>
+                </div>
+              </div>
+              <div class="aligncenter">
+                <img
+                  src="images/hero.webp"
+                  alt="A phone showing a chat with Margaret Morrison. A link to the Carnegie Mellon Web Kilt is about to be sent, with its preview above the message: the Kilt's home page, its site, title and description."
+                  width="360"
+                  height="645"
+                />
+              </div>
+            </div> </div
+        ></div>
+        <div class="content wide"
+          ><div>
+            <h1 id="get-started">Get Started</h1>
+            <div class="cmu-paths cmu-paths--two">
+              <a class="cmu-path" href="check.html">
+                <strong>Is Your Link Ready to Share?</strong>
+                <span>See how your page looks when it's shared, and what to fix.</span>
+                <span class="cta">Check a Link</span>
+              </a>
+              <a class="cmu-path" href="make.html">
+                <strong>Missing a Preview Image?</strong>
+                <span>Create the image and the tags your page is missing.</span>
+                <span class="cta">Make a Preview</span>
+              </a>
+            </div>
+          </div></div
+        >
+        <div class="content wide"
+          ><div>
+            <h1 id="prepare" class="rule-top">Prepare Your Site</h1>
+            <ol class="cmu-flow">
+              <li
+                ><strong>Make the Image</strong>A 1200 by 630 JPEG of the top of your home page,
+                under 300 KB. Take the screenshot yourself, or
+                <a href="make.html">let FencePost make it</a>. Save it as
+                <code>images/preview.jpg</code> in your site's top folder.</li
+              >
+              <li
+                ><strong>Add the Tags</strong>Put the Open Graph tags below in each page's
+                <code>&lt;head&gt;</code>. In Cascade, choose the image as the site's Social Media
+                Image instead; the template writes the tags.</li
+              >
+              <li
+                ><strong>Check the Link</strong>Publish, then
+                <a href="check.html">check a page's address</a>. Fix anything FencePost flags before
+                you share it.</li
+              >
+            </ol>
+          </div></div
+        >
+        <div class="content wide"
+          ><div>
+            <h1 id="open-graph" class="rule-top">What Is Open Graph?</h1>
+            <p>
+              Open Graph is a set of <code>&lt;meta&gt;</code> tags, first defined by Facebook in
+              2010, that describe a page to the apps that build link previews: Slack, Teams,
+              LinkedIn, iMessage and most chat and social apps. Without them, an app guesses, and
+              often shows only the page's title or a stray image from the page.
+            </p>
+            <div class="cmu-copyable">
+              <pre
+                class="cmu-snippet cmu-snippet--wrap"
+              ><code id="fp-og-example">&lt;meta property="og:site_name" content="Equipment Checkout"&gt;
+&lt;meta property="og:title" content="Reserve a Camera Kit - Equipment Checkout"&gt;
+&lt;meta property="og:description" content="Cameras, laptops and lights, free for CMU courses."&gt;
+&lt;meta property="og:url" content="https://www.cmu.edu/equipment/reserve.html"&gt;
+&lt;meta property="og:type" content="website"&gt;
+&lt;meta property="og:image" content="https://www.cmu.edu/equipment/images/preview.jpg"&gt;
+&lt;meta property="og:image:width" content="1200"&gt;
+&lt;meta property="og:image:height" content="630"&gt;
+&lt;meta property="og:image:alt" content="Equipment Checkout's home page: Reserve a Camera Kit, beside a photo of a camera kit."&gt;
+&lt;meta name="twitter:card" content="summary_large_image"&gt;</code></pre
+              ><button
+                type="button"
+                class="cmu-copy"
+                data-cmu-copy="#fp-og-example"
+                aria-label="Copy Code"
+                title="Copy Code"
+              ></button>
+            </div>
+            <ul>
+              <li>
+                <strong><code>og:title</code> and <code>og:description</code></strong> are the bold
+                title and the line under it.
+              </li>
+              <li>
+                <strong><code>og:image</code></strong> is the picture, 1200 by 630, and
+                <code>og:image:alt</code> describes it for screen readers.
+              </li>
+              <li>
+                <strong><code>og:url</code></strong> is the page's full address, so shares of the
+                same page count as one.
+              </li>
+              <li>
+                <strong><code>og:site_name</code></strong> is the site's name, which some apps show
+                with the title.
+              </li>
+              <li>
+                <strong><code>twitter:card</code></strong> set to
+                <code>summary_large_image</code> asks for the large picture instead of a thumbnail.
+              </li>
+            </ul>
+            <p>
+              The Web Kilt's
+              <a class="external" href="https://webkilt.andrew.cmu.edu/0/previews.html"
+                >Link Previews</a
+              >
+              page has the full standard, including how to add the tags in a CMS or an app.
+            </p>
+          </div></div
+        >
+      </main>
+      <footer class="grid column3 invert">
+        <div>
+          <p
+            >FencePost<br />Carnegie Mellon University<br />5000 Forbes Avenue<br />Pittsburgh, PA
+            15213</p
+          >
+          <ul
+            ><li><a href="https://www.cmu.edu/legal/">Legal Info</a></li
+            ><li><a href="https://www.cmu.edu/">www.cmu.edu</a></li></ul
+          >
+          <ul
+            ><li>&copy; 2026 Carnegie Mellon University</li></ul
+          >
+        </div>
+        <div></div>
+        <div>
+          <nav id="nav"
+            ><ul
+              ><li><a href="check.html">Check</a></li
+              ><li><a href="make.html">Make</a></li
+              ><li><a href="reference.html">Reference</a></li
+              ><li><a href="about.html">About</a></li></ul
+            ></nav
+          >
+        </div>
+      </footer>
+    </div>
+    <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js"></script>
+    <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
+    <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.7/js/cmu-app.js"
+      integrity="sha384-10393F76wEQPHaJEEoM9M1QEQsl9mTezDdEM45kArp0j26SWs3gxiGsXKrmwJHio"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

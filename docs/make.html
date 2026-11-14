@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Google tag (Google Analytics): docs pages only, never in API or MCP responses -->
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-PKL3STCZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Make - FencePost - Carnegie Mellon University</title>
+    <meta
+      name="description"
+      content="Make a link preview for a Carnegie Mellon page: a 1200 by 630 image and its Open Graph tags."
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,600,700,700italic"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://www.cmu.edu/common/standard-v6/css/main.6.7.min.css"
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.7/css/cmu-cms.css"
+      integrity="sha384-9jhXiuuhmbvQJYP71Rg8e7/NBlfXA/7MjHSMxZeSbELc/fdpt3PAwyoS4jvEMXqy"
+      crossorigin="anonymous"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.7/css/cmu-app.css"
+      integrity="sha384-Tj5sbg6foKwNHx77Xj9uSKHv4N7jiYnj97prQWE3B2+6v3K8tsqz/xmsjxeJKvjA"
+      crossorigin="anonymous"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link href="//www.cmu.edu/favicon.ico" rel="icon" />
+    <link href="//www.cmu.edu/favicon-152.png" rel="apple-touch-icon-precomposed" />
+    <meta content="#9f0000" name="msapplication-TileColor" />
+    <meta content="//www.cmu.edu/favicon-144.png" name="msapplication-TileImage" />
+  </head>
+  <body class="no-js cmu-app">
+    <div id="container">
+      <header>
+        <div class="roof red invert">
+          <div>
+            <a class="wordmark" href="https://www.cmu.edu/">Carnegie Mellon University</a>
+            <button aria-label="toggle menu" aria-pressed="false" class="menu-btn" href="#nav"
+              ><b>&#8212;</b><b>&#8212;</b><b>&#8212;</b></button
+            >
+          </div>
+        </div>
+        <div id="sitename">
+          <span class="sitetitle"><a href="./">FencePost</a></span>
+          <h2>Good Previews Make Good Neighbors</h2>
+        </div>
+      </header>
+      <main id="content">
+        <div class="breadcrumbs"><a href="./">FencePost</a>&nbsp;&rsaquo;&nbsp;Make</div>
+        <div class="content wide">
+          <div>
+            <h1>Make a Preview</h1>
+            <p class="cmu-lead">
+              Enter a public Carnegie Mellon page, or upload a screenshot of it. FencePost makes a
+              1200 by 630 JPEG under 300 KB and the tags for your page's head.
+            </p>
+            <div id="fp-status" role="status" aria-live="polite"></div>
+            <div class="cmu-split">
+              <form id="fp-form">
+                <label for="fp-url">Page Address</label
+                ><input
+                  type="text"
+                  inputmode="url"
+                  id="fp-url"
+                  required
+                  placeholder="https://www.cmu.edu/your-site/"
+                  maxlength="2048"
+                  aria-describedby="fp-url-hint"
+                />
+                <p class="cmu-hint" id="fp-url-hint">
+                  A public page on cmu.edu or an approved Carnegie Mellon domain. FencePost views it
+                  signed out.
+                </p>
+                <label for="fp-file">Screenshot (Optional)</label
+                ><input
+                  type="file"
+                  id="fp-file"
+                  accept="image/png,image/jpeg,image/webp"
+                  aria-describedby="fp-file-hint"
+                />
+                <p class="cmu-hint" id="fp-file-hint">
+                  A PNG, JPEG or WebP under 8 MB, for a page FencePost can't view, like one behind a
+                  sign-in. Leave it empty to capture the page.
+                </p>
+                <label for="fp-title">Title</label
+                ><input
+                  type="text"
+                  id="fp-title"
+                  maxlength="100"
+                  aria-describedby="fp-title-hint"
+                />
+                <p class="cmu-hint" id="fp-title-hint">
+                  Leave blank to use the page's own title. Required with a screenshot.
+                </p>
+                <label for="fp-description">Description</label
+                ><textarea id="fp-description" rows="3" maxlength="220"></textarea>
+                <label for="fp-site">Site Name</label
+                ><input type="text" id="fp-site" maxlength="60" />
+                <label for="fp-path">Image Path on Your Site</label
+                ><input
+                  type="text"
+                  id="fp-path"
+                  value="/images/preview.jpg"
+                  required
+                  maxlength="2048"
+                  aria-describedby="fp-path-hint"
+                />
+                <p class="cmu-hint" id="fp-path-hint">
+                  Where you'll save the image. The tags point to it.
+                </p>
+                <p><button class="btn" type="submit">Make the Preview</button></p>
+                <p class="cmu-hint">
+                  Once your page is live with the new tags, <a href="check.html">check the link</a>.
+                </p>
+              </form>
+              <div>
+                <p class="cmu-label">Preview</p>
+                <figure class="cmu-shot" id="fp-figure" hidden>
+                  <img id="fp-preview" alt="The link preview image." width="1200" height="630" />
+                </figure>
+                <div id="fp-actions" hidden>
+                  <p><a class="btn" id="fp-download" download="preview.jpg">Download JPEG</a></p>
+                  <p class="cmu-label">Tags for Your Page's Head</p>
+                  <div class="cmu-copyable">
+                    <pre class="cmu-snippet cmu-snippet--wrap"><code id="fp-tags"></code></pre
+                    ><button
+                      type="button"
+                      class="cmu-copy"
+                      data-cmu-copy="#fp-tags"
+                      aria-label="Copy Code"
+                      title="Copy Code"
+                    ></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer class="grid column3 invert">
+        <div>
+          <p
+            >FencePost<br />Carnegie Mellon University<br />5000 Forbes Avenue<br />Pittsburgh, PA
+            15213</p
+          >
+          <ul
+            ><li><a href="https://www.cmu.edu/legal/">Legal Info</a></li
+            ><li><a href="https://www.cmu.edu/">www.cmu.edu</a></li></ul
+          >
+          <ul
+            ><li>&copy; 2026 Carnegie Mellon University</li></ul
+          >
+        </div>
+        <div></div>
+        <div>
+          <nav id="nav"
+            ><ul
+              ><li><a href="check.html">Check</a></li
+              ><li class="active"><a href="make.html" aria-current="page">Make</a></li
+              ><li><a href="reference.html">Reference</a></li
+              ><li><a href="about.html">About</a></li></ul
+            ></nav
+          >
+        </div>
+      </footer>
+    </div>
+    <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js"></script>
+    <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
+    <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.7/js/cmu-app.js"
+      integrity="sha384-10393F76wEQPHaJEEoM9M1QEQsl9mTezDdEM45kArp0j26SWs3gxiGsXKrmwJHio"
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/make.js"></script>
+  </body>
+</html>
