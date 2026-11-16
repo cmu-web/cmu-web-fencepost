@@ -14,6 +14,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reference - FencePost - Carnegie Mellon University</title>
     <meta name="description" content="FencePost's API, MCP tools and the sites it captures." />
+    <!-- Link previews, following the Web Kilt's Link Previews / Open Graph standard -->
+    <meta property="og:site_name" content="FencePost" />
+    <meta property="og:title" content="Reference - FencePost" />
+    <meta
+      property="og:description"
+      content="FencePost's API, MCP tools and the sites it captures."
+    />
+    <meta property="og:url" content="https://fencepost.andrew.cmu.edu/reference.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://fencepost.andrew.cmu.edu/images/preview.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="FencePost's home page: Put Your Best Page Forward, beside a phone with a chat about to share a link."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,600,700,700italic"
       rel="stylesheet"
@@ -64,8 +81,13 @@
             </p>
             <h2 id="sites" class="rule-top">Which Sites It Captures</h2>
             <p>
-              Any public page on cmu.edu or a domain ending in .cmu.edu, and the Carnegie Mellon
-              domains in <code>domains.json</code>. To add a site that isn't on cmu.edu, use the
+              Any public page on cmu.edu or one of its subdomains, or on a Carnegie Mellon domain on
+              FencePost's
+              <a
+                class="external"
+                href="https://github.com/cmu-web/cmu-web-fencepost/blob/main/domains.json"
+                >list of approved domains</a
+              >. To add a site that isn't on cmu.edu, use the
               <a
                 class="external"
                 href="https://github.com/cmu-web/cmu-web-fencepost/issues/new?template=domain_request.yml"

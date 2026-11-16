@@ -17,6 +17,23 @@
       name="description"
       content="Make a link preview for a Carnegie Mellon page: a 1200 by 630 image and its Open Graph tags."
     />
+    <!-- Link previews, following the Web Kilt's Link Previews / Open Graph standard -->
+    <meta property="og:site_name" content="FencePost" />
+    <meta property="og:title" content="Make a Preview - FencePost" />
+    <meta
+      property="og:description"
+      content="Make a link preview for a Carnegie Mellon page: a 1200 by 630 image and its Open Graph tags."
+    />
+    <meta property="og:url" content="https://fencepost.andrew.cmu.edu/make.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://fencepost.andrew.cmu.edu/images/preview.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="FencePost's home page: Put Your Best Page Forward, beside a phone with a chat about to share a link."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,600,700,700italic"
       rel="stylesheet"
@@ -97,8 +114,9 @@
                   aria-describedby="fp-file-hint"
                 />
                 <p class="cmu-hint" id="fp-file-hint">
-                  A PNG, JPEG or WebP under 8 MB, for a page FencePost can't view, like one behind a
-                  sign-in. Leave it empty to capture the page.
+                  A PNG, JPEG or WebP under 8 MB, for a page FencePost can't view, such as one
+                  behind a sign-in. Use made-up names and data in it. Leave it blank to capture the
+                  page.
                 </p>
                 <label for="fp-title">Title</label
                 ><input
@@ -108,12 +126,23 @@
                   aria-describedby="fp-title-hint"
                 />
                 <p class="cmu-hint" id="fp-title-hint">
-                  Leave blank to use the page's own title. Required with a screenshot.
+                  Leave it blank to use the page's own title. Required with a screenshot.
                 </p>
                 <label for="fp-description">Description</label
-                ><textarea id="fp-description" rows="3" maxlength="220"></textarea>
+                ><textarea
+                  id="fp-description"
+                  rows="3"
+                  maxlength="220"
+                  aria-describedby="fp-description-hint"
+                ></textarea>
+                <p class="cmu-hint" id="fp-description-hint">
+                  Leave it blank to use the page's own description.
+                </p>
                 <label for="fp-site">Site Name</label
-                ><input type="text" id="fp-site" maxlength="60" />
+                ><input type="text" id="fp-site" maxlength="60" aria-describedby="fp-site-hint" />
+                <p class="cmu-hint" id="fp-site-hint">
+                  The site's name, such as Equipment Checkout. Some apps show it with the title.
+                </p>
                 <label for="fp-path">Image Path on Your Site</label
                 ><input
                   type="text"

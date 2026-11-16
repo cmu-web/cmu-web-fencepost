@@ -99,6 +99,12 @@ async function imageInfo(url: string, fetcher: Fetcher): Promise<ImageInfo> {
 
 // Reads a page's preview tags and its image, and checks them against the
 // Web Kilt's Link Previews standard
+// A count in words, as AP style writes numbers under 10: "twice," "three times"
+const COUNTS = ["", "once", "twice", "three", "four", "five", "six", "seven", "eight", "nine"];
+function times(n: number): string {
+  return n < 3 ? COUNTS[n] : `${n < 10 ? COUNTS[n] : n} times`;
+}
+
 export async function checkLink(
   input: string,
   allow: (host: string) => boolean,
@@ -124,7 +130,7 @@ export async function checkLink(
       add(
         `${k}-twice`,
         "fix",
-        `${k} appears ${tags.get(k)!.length} times. A CMS may already write it; remove the extra copy.`,
+        `${k} appears ${times(tags.get(k)!.length)}. A CMS may already write it; remove the extra copy.`,
       );
 
   const title = one("og:title");
@@ -140,7 +146,7 @@ export async function checkLink(
       "note",
       "The description is long; apps may cut it off after about 200 characters.",
     );
-  else add("description", "pass", "The description is one short sentence.");
+  else add("description", "pass", "The description is short enough to show in full.");
 
   const siteName = one("og:site_name");
   if (siteName) add("site", "pass", `The site's name is "${siteName}".`);
@@ -200,7 +206,7 @@ export async function checkLink(
     add(
       "article",
       "note",
-      "This is an article; add article:published_time so previews show its date.",
+      "This is an article; add article:published_time so previews can show its date.",
     );
 
   return {

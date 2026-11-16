@@ -4,7 +4,7 @@ Link previews for Carnegie Mellon websites. Give FencePost a page, and it
 makes the image that shows when someone shares the link (1200 by 630, under
 300 KB) and the Open Graph tags that go with it.
 
-Named for The Fence, where Carnegie Mellon students paint what they want
+Named for the Fence, where Carnegie Mellon students paint what they want
 everyone to see.
 
 FencePost follows the Carnegie Mellon Web Kilt's
@@ -12,14 +12,12 @@ FencePost follows the Carnegie Mellon Web Kilt's
 part of [CMU Web](https://github.com/cmu-web), a collection of projects for
 Carnegie Mellon web development.
 
-Not built yet.
-
 ## Which Sites It Captures
 
 FencePost makes previews for public pages, the way a social site sees them.
 
-- **Carnegie Mellon sites:** any page on `cmu.edu` or a domain ending in
-  `.cmu.edu`. The check matches the end of the hostname exactly, so
+- **Carnegie Mellon sites:** any page on `cmu.edu` or any of its
+  subdomains. The check matches the end of the hostname exactly, so
   `notcmu.edu` and `cmu.edu.example.com` are refused.
 - **Other Carnegie Mellon sites:** domains listed in `domains.json`, for sites
   run by a Carnegie Mellon department, center, office or recognized student
@@ -38,7 +36,7 @@ FencePost makes previews for public pages, the way a social site sees them.
 ## Gallery Shots
 
 For the CMU Web gallery and the project cards on each About page, FencePost
-takes the same kind of screenshot at 1040 × 656, as WebP:
+takes the same kind of screenshot at 1040 by 656, as WebP:
 
 ```bash
 npm run gallery -- https://www.cmu.edu/example/ example.webp
