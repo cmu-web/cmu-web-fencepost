@@ -8,7 +8,7 @@ Named for The Fence, where Carnegie Mellon students paint what they want
 everyone to see.
 
 FencePost follows the Carnegie Mellon Web Kilt's
-[Link Previews](https://webkilt.andrew.cmu.edu/0/previews.html) standard. It's
+[Link Previews / Open Graph](https://webkilt.andrew.cmu.edu/0/previews.html) standard. It's
 part of [CMU Web](https://github.com/cmu-web), a collection of projects for
 Carnegie Mellon web development.
 
@@ -34,6 +34,19 @@ FencePost makes previews for public pages, the way a social site sees them.
   hosts live. It checks the allowed domains and addresses again after every
   redirect, and fetches signed out, so a page behind a sign-in fails
   instead of turning into an image.
+
+## Gallery Shots
+
+For the CMU Web gallery and the project cards on each About page, FencePost
+takes the same kind of screenshot at 1040 × 656, as WebP:
+
+```bash
+npm run gallery -- https://www.cmu.edu/example/ example.webp
+```
+
+It follows the same rules as a link preview: a public page on a site
+FencePost captures, signed out, with the menu closed. It isn't part of the
+site or the API.
 
 ## License
 

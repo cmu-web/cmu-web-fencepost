@@ -29,8 +29,15 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.7/css/cmu-cms.css"
-      integrity="sha384-9jhXiuuhmbvQJYP71Rg8e7/NBlfXA/7MjHSMxZeSbELc/fdpt3PAwyoS4jvEMXqy"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/css/cmu-cms.css"
+      integrity="sha384-IY3Y+cmKYy4pjMLJRa/ynoPUYLNOgMbK4qImyQQocVvO6GTqVuKhIT6/olEUDi5e"
+      crossorigin="anonymous"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/css/cmu-app.css"
+      integrity="sha384-2jLWqCd2cc1X5lySEjSIsY3mZhiKqacJc1fvAwSLjtSg3E13TJVOnpe9pAb8DMHP"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
@@ -176,10 +183,23 @@
             <p>
               The Web Kilt's
               <a class="external" href="https://webkilt.andrew.cmu.edu/0/previews.html"
-                >Link Previews</a
+                >Link Previews / Open Graph</a
               >
               page has the full standard, including how to add the tags in a CMS or an app.
             </p>
+          </div></div
+        >
+        <div class="content wide"
+          ><div>
+            <!-- prettier-ignore -->
+            <div class="cmu-agent">
+              <h2 id="agent" class="rule-top">Set Up With an AI Agent</h2>
+              <p>Copy the prompt into an AI coding agent in your editor or terminal, and it sets up your site's link previews with FencePost. <button type="button" class="cmu-copy" data-cmu-copy="#fp-agent-prompt" aria-label="Copy the Prompt" title="Copy the Prompt"></button></p>
+              <details class="cmu-more">
+                <summary>Want to read it first? <span class="cmu-more-link"><span class="cmu-more-closed">See the Prompt</span><span class="cmu-more-open">Hide the Prompt</span></span></summary>
+                <pre class="cmu-snippet"><code id="fp-agent-prompt">Set up link previews for this site with FencePost. Read https://fencepost.andrew.cmu.edu/reference.html and the Web Kilt's standard at https://webkilt.andrew.cmu.edu/0/previews.html first. If you can connect MCP servers, add https://fencepost.andrew.cmu.edu/mcp and use its get_guide, check_link and generate_preview tools; otherwise use its API. FencePost works on public pages on cmu.edu or an approved Carnegie Mellon domain. Once the home page is published, make the site's preview image from it with generate_preview and save it as images/preview.jpg in the site's top folder. Add the Open Graph tags to the layout every page uses, filled in from each page's title, description and address, with the image's full address. Then run check_link on a few published pages and fix what it reports. Keep anyone's name or data out of the tags and the image.</code></pre>
+              </details>
+            </div>
           </div></div
         >
       </main>
@@ -214,8 +234,8 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
     <script
-      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.7/js/cmu-app.js"
-      integrity="sha384-10393F76wEQPHaJEEoM9M1QEQsl9mTezDdEM45kArp0j26SWs3gxiGsXKrmwJHio"
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/js/cmu-app.js"
+      integrity="sha384-kPYaRNjRAHnEY27lj3wKX2UTLNzxejzJWxXQ9pxOoRSmE2u7/p+KpJDix8iJedFe"
       crossorigin="anonymous"
     ></script>
   </body>
