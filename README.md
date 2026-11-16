@@ -46,6 +46,16 @@ It follows the same rules as a link preview: a public page on a site
 FencePost captures, signed out, with the menu closed. It isn't part of the
 site or the API.
 
+Add `--phone` for the page on a phone instead: 390 by 844 at double
+resolution, with a phone's status bar across the top in the page's own top
+color, its time and battery in white or near-black, whichever reads better.
+It's made for the Web Kilt's phone frame (`cmu-shot--phone`), whose camera
+sits over that bar.
+
+```bash
+npm run gallery -- https://www.cmu.edu/example/ example-phone.webp --phone
+```
+
 ## License
 
 The code is available under the [BSD 3-Clause License](LICENSE). Carnegie

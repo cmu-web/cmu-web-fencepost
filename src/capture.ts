@@ -192,6 +192,8 @@ let active = 0;
  * project's cmu-web-preview.webp) */
 export const PREVIEW_SIZE = { width: 1200, height: 630 };
 export const GALLERY_SIZE = { width: 1040, height: 656 };
+/** A phone's screen (390 by 844) less its status bar, which statusbar.ts adds */
+export const PHONE_SIZE = { width: 390, height: 797 };
 
 // Screenshots the top of a public page, signed out, at a link preview's size
 // unless given another. The browser has no network of its own: every request
@@ -200,6 +202,8 @@ export async function capturePage(
   input: string,
   allow: (host: string) => boolean,
   size: { width: number; height: number } = PREVIEW_SIZE,
+  /** Device pixels per CSS pixel: 2 for a phone's sharper screen */
+  scale = 1,
 ): Promise<Capture> {
   publicUrl(input);
   if (active >= 2)
@@ -214,7 +218,7 @@ export async function capturePage(
     try {
       const context = await browser.newContext({
         viewport: size,
-        deviceScaleFactor: 1,
+        deviceScaleFactor: scale,
         serviceWorkers: "block",
         acceptDownloads: false,
       });

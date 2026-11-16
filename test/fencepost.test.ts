@@ -1,5 +1,6 @@
 import sharp from "sharp";
 import request from "supertest";
+import { inkFor, STATUS_BAR, topColor, withStatusBar } from "../src/statusbar";
 import { describe, expect, it } from "vitest";
 import { createApp } from "../src/app";
 import { card, openGraph } from "../src/card";
@@ -239,5 +240,25 @@ describe("the link checker", () => {
       .send({ url: "https://example.com/" })
       .expect(403);
     expect(refused.body.error).toMatch(/Carnegie Mellon sites/);
+  });
+});
+
+describe("phone status bar", () => {
+  it("picks white on the roof's red and gray, near-black on white", () => {
+    expect(inkFor([196, 18, 48])).toBe("#fff");
+    expect(inkFor([109, 110, 113])).toBe("#fff");
+    expect(inkFor([255, 255, 255])).toBe("#1d2125");
+  });
+
+  it("adds the bar above the page in the page's top color", async () => {
+    const page = await sharp({
+      create: { width: 780, height: 400, channels: 3, background: { r: 196, g: 18, b: 48 } },
+    })
+      .png()
+      .toBuffer();
+    const out = await withStatusBar(page, 2);
+    const meta = await sharp(out).metadata();
+    expect([meta.width, meta.height]).toEqual([780, 400 + STATUS_BAR * 2]);
+    expect(await topColor(out)).toEqual([196, 18, 48]);
   });
 });
