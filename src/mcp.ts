@@ -38,7 +38,7 @@ export function createMcp(
       content: [
         {
           type: "text",
-          text: `check_link takes url and reports what a share would show and what to fix. generate_preview takes url (a public page on cmu.edu or an approved Carnegie Mellon domain), and optionally title (up to ${LIMITS.title} characters), description (up to ${LIMITS.description}), site (the site's name, up to ${LIMITS.site}), imagePath (where the site will host the image, default /images/preview.jpg) and screenshot (base64 PNG, JPEG or WebP under 8 MB, to skip the capture). It returns the JPEG and the tags; nothing is stored. Pages are captured signed out, so a page behind a sign-in fails; upload a screenshot instead. Approved domains: ${domains.map((d) => d.domain).join(", ") || "none yet"}. To add one, use the Request a Domain form in the GitHub repository. Full reference: ${base}/reference.html. Maintained by the Office of the Vice Provost for Teaching and Learning Innovation.`,
+          text: `check_link takes url and reports what a share would show and what to fix. generate_preview takes url (a public page on cmu.edu or an approved Carnegie Mellon domain), and optionally title (up to ${LIMITS.title} characters), description (up to ${LIMITS.description}), site (the site's name, up to ${LIMITS.site}), imagePath (where the site will host the image, default /images/preview.jpg) and screenshot (base64 PNG, JPEG or WebP under 8 MB, to skip the capture). It returns the JPEG and the tags; nothing is stored. Pages are captured signed out, so a page behind a sign-in fails; upload a screenshot instead. Approved domains: ${domains.map((d) => d.domain).join(", ") || "none yet"}. To add one, use the Request a Domain form in the GitHub repository. Full reference: ${base}/reference.html.`,
         },
       ],
     }),
@@ -48,7 +48,7 @@ export function createMcp(
     {
       title: "Check a Link",
       description:
-        "Read a public Carnegie Mellon page's Open Graph tags and preview image, and check them against the Web Kilt's Link Previews standard. Returns what a share would show and what to fix.",
+        "Read a public Carnegie Mellon page's Open Graph tags and preview image, and check them against the Web Kilt's Link Previews / Open Graph standard. Returns what a share would show and what to fix.",
       inputSchema: { url: z.string().url().max(2048) },
       annotations: { readOnlyHint: true, openWorldHint: true },
     },

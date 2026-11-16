@@ -8,6 +8,21 @@ export interface Finding {
   key: string;
   status: "pass" | "fix" | "note";
   text: string;
+  /** For a fix or note: the section of the standard that covers it */
+  standard?: { title: string; url: string };
+}
+
+/** The Web Kilt's Link Previews standard and the section for each finding */
+export const STANDARD = "https://webkilt.andrew.cmu.edu/0/previews.html";
+const SECTIONS = {
+  image: "Make a Preview Image",
+  tags: "Open Graph Tags",
+  articles: "News Stories and Posts",
+} as const;
+function section(key: string): keyof typeof SECTIONS {
+  if (key === "article") return "articles";
+  if (/^(image|alt)/.test(key)) return "image";
+  return "tags";
 }
 
 export interface ImageInfo {
@@ -95,8 +110,14 @@ export async function checkLink(
   const { tags, title: htmlTitle } = readTags(page.body.toString("utf8"));
   const one = (k: string) => tags.get(k)?.[0]?.trim() || "";
   const findings: Finding[] = [];
-  const add = (key: string, status: Finding["status"], text: string) =>
-    findings.push({ key, status, text });
+  const add = (key: string, status: Finding["status"], text: string) => {
+    const id = section(key);
+    findings.push(
+      status === "pass"
+        ? { key, status, text }
+        : { key, status, text, standard: { title: SECTIONS[id], url: `${STANDARD}#${id}` } },
+    );
+  };
 
   for (const k of ["og:title", "og:description", "og:image", "og:url"])
     if ((tags.get(k)?.length || 0) > 1)

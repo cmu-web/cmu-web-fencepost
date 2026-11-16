@@ -18,6 +18,14 @@
       findings.map(function (f) {
         var li = document.createElement("li");
         li.textContent = f.text;
+        // The section of the Web Kilt's standard that covers it
+        if (f.standard) {
+          var a = document.createElement("a");
+          a.className = "external";
+          a.href = f.standard.url;
+          a.textContent = f.standard.title;
+          li.append(document.createElement("br"), "See ", a, ".");
+        }
         return li;
       }),
     );

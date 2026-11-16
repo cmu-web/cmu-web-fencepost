@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createApp } from "../src/app";
 import { card, openGraph } from "../src/card";
 import { publicAddress, publicFetch, publicUrl, tracker } from "../src/capture";
-import { checkLink, readTags, type Fetcher } from "../src/check";
+import { checkLink, STANDARD, readTags, type Fetcher } from "../src/check";
 import { allowedHost, type Domain } from "../src/domains";
 import type { Capturer } from "../src/preview";
 import { GenerateError } from "../src/shared";
@@ -208,6 +208,14 @@ describe("the link checker", () => {
       ]),
     );
     expect(r.findings.find((f) => f.key === "image-size")?.text).toContain("900 by 600");
+  });
+
+  it("links each fix to its section of the standard, and no pass", async () => {
+    const r = await checkLink("https://www.cmu.edu/bare/", allow, fetcher);
+    const link = (key: string) => r.findings.find((f) => f.key === key)?.standard;
+    expect(link("alt")).toEqual({ title: "Make a Preview Image", url: `${STANDARD}#image` });
+    expect(link("card")).toEqual({ title: "Open Graph Tags", url: `${STANDARD}#tags` });
+    expect(r.findings.filter((f) => f.status === "pass").every((f) => !f.standard)).toBe(true);
   });
 
   it("reads tags written either way, with entities", () => {
