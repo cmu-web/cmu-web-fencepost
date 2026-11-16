@@ -1,5 +1,5 @@
 import { Resolver } from "node:dns/promises";
-import http from "node:http";
+import http, { STATUS_CODES } from "node:http";
 import https from "node:https";
 import ipaddr from "ipaddr.js";
 import { chromium } from "playwright";
@@ -156,11 +156,15 @@ export async function publicFetch(
     if (redirects >= 5) throw new GenerateError("The site redirects too many times.");
     return publicFetch(new URL(result.location, url).href, allow, redirects + 1);
   }
-  if (result.status >= 400)
+  if (result.status >= 400) {
+    const answer = `The address returned ${result.status} ${STATUS_CODES[result.status] || "Error"}.`;
     throw new GenerateError(
-      "The page didn't load. It may need a sign-in, which FencePost doesn't use.",
+      result.status === 401 || result.status === 403
+        ? `${answer} It may need a sign-in, which FencePost doesn't use.`
+        : answer,
       502,
     );
+  }
   return { body: result.body, type: result.type, url: url.href };
 }
 
@@ -184,11 +188,18 @@ export interface Capture {
 
 let active = 0;
 
-// Screenshots the top of a public page at 1200 x 630, signed out. The browser
-// has no network of its own: every request goes through publicFetch.
+/** A link preview's size, and a CMU Web gallery shot's (the size of each
+ * project's cmu-web-preview.webp) */
+export const PREVIEW_SIZE = { width: 1200, height: 630 };
+export const GALLERY_SIZE = { width: 1040, height: 656 };
+
+// Screenshots the top of a public page, signed out, at a link preview's size
+// unless given another. The browser has no network of its own: every request
+// goes through publicFetch.
 export async function capturePage(
   input: string,
   allow: (host: string) => boolean,
+  size: { width: number; height: number } = PREVIEW_SIZE,
 ): Promise<Capture> {
   publicUrl(input);
   if (active >= 2)
@@ -202,7 +213,7 @@ export async function capturePage(
     });
     try {
       const context = await browser.newContext({
-        viewport: { width: 1200, height: 630 },
+        viewport: size,
         deviceScaleFactor: 1,
         serviceWorkers: "block",
         acceptDownloads: false,
@@ -240,6 +251,16 @@ export async function capturePage(
       try {
         await page.goto(page0.url, { waitUntil: "load", timeout: 15000 });
         await page.evaluate(() => document.fonts.ready);
+        // The template opens its menu on its own on a wide screen; the
+        // standard shows the page with the menu closed
+        const menu = page.locator('.menu-btn[aria-pressed="true"]');
+        if (await menu.count()) {
+          await menu
+            .first()
+            .click({ timeout: 2000 })
+            .catch(() => undefined);
+          await page.waitForTimeout(500);
+        }
         const title = (await page.title()).slice(0, 100);
         const description = (
           await page
