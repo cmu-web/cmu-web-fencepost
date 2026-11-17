@@ -16,9 +16,15 @@ const domains = JSON.parse(readFileSync("domains.json", "utf8"));
 // address), sorted by group
 const groups = new Map();
 for (const d of domains) groups.set(d.group, [...(groups.get(d.group) ?? []), d]);
+// A site's www. address counts too, but only a bare domain (two parts) has one
+// worth naming; cmu-web.github.io doesn't
 const site = (d) =>
-  `<code>${esc(d.domain)}</code> ${
-    d.subdomains ? "and its subdomains" : `and <code>www.${esc(d.domain)}</code>`
+  `<code>${esc(d.domain)}</code>${
+    d.subdomains
+      ? " and its subdomains"
+      : d.domain.split(".").length === 2
+        ? ` and <code>www.${esc(d.domain)}</code>`
+        : ""
   }`;
 const rows = [...groups]
   .sort(([a], [b]) => a.localeCompare(b, "en", { sensitivity: "base" }))
