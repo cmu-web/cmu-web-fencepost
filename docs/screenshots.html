@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Google tag (Google Analytics): docs pages only, never in API or MCP responses -->
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-PKL3STCZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Take a Screenshot - FencePost - Carnegie Mellon University</title>
+    <meta
+      name="description"
+      content="Take a screenshot of a public Carnegie Mellon page: a mobile view for a mockup, or a card for the CMU Web Gallery."
+    />
+    <!-- Link previews, following the Web Kilt's Link Previews / Open Graph standard -->
+    <meta property="og:site_name" content="FencePost" />
+    <meta property="og:title" content="Take a Screenshot - FencePost" />
+    <meta
+      property="og:description"
+      content="Take a screenshot of a public Carnegie Mellon page: a mobile view for a mockup, or a card for the CMU Web Gallery."
+    />
+    <meta property="og:url" content="https://fencepost.andrew.cmu.edu/screenshots.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://fencepost.andrew.cmu.edu/images/preview.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="FencePost's home page: Put Your Best Page Forward, beside a phone with a chat about to share a link."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,600,700,700italic"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://www.cmu.edu/common/standard-v6/css/main.6.7.min.css"
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/css/cmu-cms.css"
+      integrity="sha384-zV4Oiwe8ikYWEc5ApP5p49KYu9glzcYVwoCr90Jw3csuQOQt9U/RRarEyL/ZvGgd"
+      crossorigin="anonymous"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/css/cmu-app.css"
+      integrity="sha384-0k+Fq/HOfWMJfjLdEWk0w9Y9wf2SN+TAxLSCc5FtIYooZOQZOpAnhfe0fHre8ZCf"
+      crossorigin="anonymous"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link href="//www.cmu.edu/favicon.ico" rel="icon" />
+    <link href="//www.cmu.edu/favicon-152.png" rel="apple-touch-icon-precomposed" />
+    <meta content="#9f0000" name="msapplication-TileColor" />
+    <meta content="//www.cmu.edu/favicon-144.png" name="msapplication-TileImage" />
+  </head>
+  <body class="no-js cmu-app">
+    <div id="container">
+      <header>
+        <div class="roof red invert">
+          <div>
+            <a class="wordmark" href="https://www.cmu.edu/">Carnegie Mellon University</a>
+            <button aria-label="toggle menu" aria-pressed="false" class="menu-btn" href="#nav"
+              ><b>&#8212;</b><b>&#8212;</b><b>&#8212;</b></button
+            >
+          </div>
+        </div>
+        <div id="sitename">
+          <span class="sitetitle"><a href="./">FencePost</a></span>
+          <h2>Good Previews Make Good Neighbors</h2>
+        </div>
+      </header>
+      <main id="content">
+        <div class="breadcrumbs"
+          ><a href="./">FencePost</a>&nbsp;&rsaquo;&nbsp;Take a Screenshot</div
+        >
+        <div class="content wide">
+          <div>
+            <h1>Showing Off Your Site?</h1>
+            <p class="cmu-lead">
+              Get your page as a mobile view for a mockup or as a card for the CMU Web Gallery.
+            </p>
+            <div id="fp-status" role="status" aria-live="polite"></div>
+            <div class="cmu-split">
+              <form id="fp-form">
+                <label for="fp-url">Link</label
+                ><input
+                  type="text"
+                  inputmode="url"
+                  id="fp-url"
+                  required
+                  placeholder="forbesandmoreword.andrew.cmu.edu"
+                  maxlength="2048"
+                  aria-describedby="fp-url-hint"
+                />
+                <p class="cmu-hint" id="fp-url-hint">
+                  Any public page within cmu.edu or an
+                  <a href="reference.html#sites">approved domain</a>.
+                </p>
+                <fieldset class="cmu-choices">
+                  <legend class="cmu-label">What to Take</legend>
+                  <ul>
+                    <li>
+                      <label
+                        ><input type="radio" name="fp-kind" value="phone" checked /><span
+                          >A mobile view for a mockup (430 &times; 790)<br /><span class="cmu-hint"
+                            >Saved at twice its size, with a phone&rsquo;s status bar.</span
+                          ></span
+                        ></label
+                      >
+                    </li>
+                    <li>
+                      <label
+                        ><input type="radio" name="fp-kind" value="card" />A card for the CMU Web
+                        Gallery or an About page (1040 &times; 656)</label
+                      >
+                    </li>
+                  </ul>
+                </fieldset>
+                <p><button class="btn" type="submit">Take the Screenshot</button></p>
+              </form>
+              <div>
+                <p class="cmu-label" id="fp-shot-label">Example Screenshot</p>
+                <div class="spinner" id="fp-spinner" hidden
+                  ><div class="double-bounce1"></div><div class="double-bounce2"></div
+                ></div>
+                <figure class="cmu-shot cmu-shot--phone" id="fp-figure">
+                  <img
+                    id="fp-preview"
+                    src="images/example-phone.webp"
+                    alt="An example screenshot: Forbes &amp; Moreword's home page on a phone."
+                    width="430"
+                    height="790"
+                  />
+                </figure>
+                <div id="fp-actions" hidden>
+                  <label for="fp-format">File Type</label>
+                  <div class="cmu-field-button">
+                    <select id="fp-format" aria-describedby="fp-format-hint">
+                      <option value="webp">WebP</option>
+                      <option value="png">PNG</option>
+                      <option value="jpeg">JPEG</option>
+                    </select>
+                    <a class="btn" id="fp-download" download>Download</a>
+                  </div>
+                  <p class="cmu-hint" id="fp-format-hint"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer class="grid column3 invert">
+        <div>
+          <p
+            >FencePost<br />Carnegie Mellon University<br />5000 Forbes Avenue<br />Pittsburgh, PA
+            15213</p
+          >
+          <ul
+            ><li><a href="https://www.cmu.edu/legal/">Legal Info</a></li
+            ><li><a href="https://www.cmu.edu/">www.cmu.edu</a></li></ul
+          >
+          <ul
+            ><li>&copy; 2026 Carnegie Mellon University</li></ul
+          >
+        </div>
+        <div></div>
+        <div>
+          <nav id="nav"
+            ><ul
+              ><li><a href="check.html">Check a Link</a></li
+              ><li><a href="generate.html">Generate a Preview</a></li
+              ><li class="active"
+                ><a href="screenshots.html" aria-current="page">Take a Screenshot</a></li
+              ><li><a href="reference.html">Reference</a></li
+              ><li><a href="about.html">About</a></li></ul
+            ></nav
+          >
+        </div>
+      </footer>
+    </div>
+    <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js"></script>
+    <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
+    <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/js/cmu-app.js"
+      integrity="sha384-OUj0Xw1O/00sPRbiU9tY0EIto5q/A7Nn7ZxhbEwk2B/5lcnAbLldNxyL52FO+MSK"
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/screenshots.js"></script>
+  </body>
+</html>

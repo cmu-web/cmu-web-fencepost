@@ -8,6 +8,8 @@ export interface Finding {
   key: string;
   status: "pass" | "fix" | "note";
   text: string;
+  /** For a fix or note: the tag it's about, shown in bold before the text */
+  tag?: string;
   /** For a fix or note: the section of the standard that covers it */
   standard?: { title: string; url: string };
 }
@@ -20,7 +22,7 @@ const SECTIONS = {
   articles: "News Stories and Posts",
 } as const;
 function section(key: string): keyof typeof SECTIONS {
-  if (key === "article") return "articles";
+  if (key.startsWith("article")) return "articles";
   if (/^(image|alt)/.test(key)) return "image";
   return "tags";
 }
@@ -109,6 +111,8 @@ export async function checkLink(
   input: string,
   allow: (host: string) => boolean,
   fetcher: Fetcher = publicFetch,
+  /** The person says the page is a news story or post */
+  article = false,
 ): Promise<CheckResult> {
   publicUrl(input);
   const page: Fetched = await fetcher(input, allow);
@@ -116,12 +120,18 @@ export async function checkLink(
   const { tags, title: htmlTitle } = readTags(page.body.toString("utf8"));
   const one = (k: string) => tags.get(k)?.[0]?.trim() || "";
   const findings: Finding[] = [];
-  const add = (key: string, status: Finding["status"], text: string) => {
+  const add = (key: string, status: Finding["status"], text: string, tag?: string) => {
     const id = section(key);
     findings.push(
       status === "pass"
         ? { key, status, text }
-        : { key, status, text, standard: { title: SECTIONS[id], url: `${STANDARD}#${id}` } },
+        : {
+            key,
+            status,
+            text,
+            ...(tag ? { tag } : {}),
+            standard: { title: SECTIONS[id], url: `${STANDARD}#${id}` },
+          },
     );
   };
 
@@ -130,64 +140,71 @@ export async function checkLink(
       add(
         `${k}-twice`,
         "fix",
-        `${k} appears ${times(tags.get(k)!.length)}. A CMS may already write it; remove the extra copy.`,
+        `It's there ${times(tags.get(k)!.length)}. A CMS may already write it; remove the extra copy.`,
+        k,
       );
 
   const title = one("og:title");
   if (title) add("title", "pass", `The title is "${title}".`);
-  else add("title", "fix", "Add og:title: the page's name, then the site's.");
+  else add("title", "fix", "Add the page's name, then the site's.", "og:title");
 
   const description = one("og:description");
   if (!description)
-    add("description", "fix", "Add og:description: one short sentence about the page.");
+    add("description", "fix", "Add one short sentence about the page.", "og:description");
   else if (description.length > 200)
     add(
       "description",
       "note",
-      "The description is long; apps may cut it off after about 200 characters.",
+      "It's long; apps may cut it off after about 200 characters.",
+      "og:description",
     );
   else add("description", "pass", "The description is short enough to show in full.");
 
   const siteName = one("og:site_name");
   if (siteName) add("site", "pass", `The site's name is "${siteName}".`);
-  else add("site", "fix", "Add og:site_name with the site's name.");
+  else add("site", "fix", "Add the site's name.", "og:site_name");
 
   const ogUrl = one("og:url");
-  if (!ogUrl) add("url", "fix", "Add og:url with the page's full https:// address.");
-  else if (!/^https:\/\//i.test(ogUrl)) add("url", "fix", "Give og:url a full https:// address.");
+  if (!ogUrl) add("url", "fix", "Add the page's full https:// address.", "og:url");
+  else if (!/^https:\/\//i.test(ogUrl))
+    add("url", "fix", "Give it a full https:// address.", "og:url");
   else if (ogUrl.replace(/\/$/, "") !== page.url.replace(/\/$/, ""))
-    add("url", "note", `og:url points to ${ogUrl}, not to this address.`);
+    add("url", "note", `It points to ${ogUrl}, not to this address.`, "og:url");
   else add("url", "pass", "og:url is this page's full address.");
 
   let image: ImageInfo | undefined;
   const rawImage = one("og:image");
-  if (!rawImage) add("image", "fix", "Add og:image: the site's preview image, 1200 by 630.");
+  if (!rawImage)
+    add("image", "fix", "Add the site's preview image, 1200 × 630 pixels.", "og:image");
   else {
     if (!/^https:\/\//i.test(rawImage))
-      add("image-address", "fix", "Give og:image a full https:// address, not a path.");
+      add("image-address", "fix", "Give it a full https:// address, not a path.", "og:image");
     image = await imageInfo(new URL(rawImage, page.url).href, fetcher);
-    if (image.error) add("image", "fix", `The image didn't load: ${image.error}`);
+    if (image.error) add("image", "fix", `The image didn't load: ${image.error}`, "og:image");
     else {
       if (image.width === 1200 && image.height === 630)
-        add("image-size", "pass", "The image is 1200 by 630.");
+        add("image-size", "pass", "The image is 1200 × 630 pixels.");
       else
         add(
           "image-size",
           "fix",
-          `Make the image 1200 by 630; it's ${image.width} by ${image.height}.`,
+          `Make the image 1200 × 630 pixels; it's ${image.width} × ${image.height}.`,
+          "og:image",
         );
       if (image.bytes! > 300_000)
         add(
           "image-bytes",
           "fix",
-          `Make the image smaller than 300 KB; it's ${Math.round(image.bytes! / 1000)} KB.`,
+          `Make the image under 300 KB; it's ${Math.round(image.bytes! / 1000)} KB.`,
+          "og:image",
         );
       else add("image-bytes", "pass", `The image is ${Math.round(image.bytes! / 1000)} KB.`);
       if (image.format !== "jpeg")
         add(
           "image-type",
           "note",
-          `The image is a ${image.format?.toUpperCase()}; the standard is a JPEG.`,
+          `The image is a ${image.format?.toUpperCase()}; the standard calls for a JPEG.`,
+          "og:image",
         );
     }
   }
@@ -195,19 +212,45 @@ export async function checkLink(
   const imageAlt = one("og:image:alt");
   if (rawImage) {
     if (imageAlt) add("alt", "pass", "The image has alt text.");
-    else add("alt", "fix", "Add og:image:alt: name the site and say what the image shows.");
+    else add("alt", "fix", "Name the site and say what the image shows.", "og:image:alt");
   }
 
   const card = one("twitter:card");
   if (card === "summary_large_image") add("card", "pass", "twitter:card asks for the large image.");
-  else add("card", "fix", "Set twitter:card to summary_large_image for the larger preview.");
+  else add("card", "fix", "Set it to summary_large_image for the large preview.", "twitter:card");
 
-  if (one("og:type") === "article" && !one("article:published_time"))
-    add(
-      "article",
-      "note",
-      "This is an article; add article:published_time so previews can show its date.",
-    );
+  // Author and date: for articles only, as the standard explains. When the
+  // person says the page is one, missing ones are fixes; when only the page
+  // says so (og:type), they're notes. Other pages aren't checked.
+  const isArticle = one("og:type") === "article";
+  if (article || isArticle) {
+    const missing = article ? "fix" : "note";
+    if (article)
+      add(
+        "article-type",
+        isArticle ? "pass" : "fix",
+        isArticle ? "og:type says it's an article." : "Set it to article.",
+        "og:type",
+      );
+    if (one("article:published_time"))
+      add("article-date", "pass", "The article has its publication date.");
+    else
+      add(
+        "article-date",
+        missing,
+        "Add the date and time it was published, so previews can show it.",
+        "article:published_time",
+      );
+    if (one("article:author") || one("author"))
+      add("article-author", "pass", "The article names its author.");
+    else
+      add(
+        "article-author",
+        missing,
+        "Add the author's name, so previews can credit them.",
+        "article:author",
+      );
+  }
 
   return {
     url: page.url,

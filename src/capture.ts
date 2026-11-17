@@ -12,20 +12,42 @@ resolver.setServers((process.env.DNS_SERVERS || "1.1.1.1,8.8.8.8").split(","));
 
 const USER_AGENT = "FencePost/1.0 (link preview; https://fencepost.andrew.cmu.edu/)";
 
+/** An address as typed: www.cmu.edu/example/ and www.cmu.edu:8443/ get
+ *  https:// in front; only a scheme followed by // counts as one */
+export function withScheme(input: string): string {
+  const trimmed = input.trim();
+  return /^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed.replace(/^\/\//, "")}`;
+}
+
+// Any port: CMU sites run on all sorts of them. The address still has to
+// resolve to a public IP (resolvePublic), so a port doesn't reach anything
+// private.
+// A failed connection, in plain words
+function networkMessage(e: NodeJS.ErrnoException): string {
+  const code = e.code || "";
+  if (/CERT|SSL|TLS|SELF_SIGNED|ALTNAME/.test(code))
+    return "This site's security certificate doesn't match the link, so FencePost can't safely load it.";
+  if (code === "ECONNREFUSED")
+    return "FencePost couldn't connect to that site. Check the link, or try again later.";
+  if (code === "ECONNRESET" || code === "EPIPE")
+    return "The site stopped responding partway through. Try again.";
+  if (code === "ETIMEDOUT") return "The site took too long to respond.";
+  return "FencePost couldn't reach the site.";
+}
+
 export function publicUrl(input: string): URL {
   let url: URL;
   try {
     url = new URL(input);
   } catch {
-    throw new GenerateError("Enter a full web address, starting with https://.");
+    throw new GenerateError("Enter a link to a page, such as www.cmu.edu/example/.");
   }
-  if (
-    !["http:", "https:"].includes(url.protocol) ||
-    url.username ||
-    url.password ||
-    (url.port && !["80", "443"].includes(url.port))
-  )
-    throw new GenerateError("Use an http or https address without a sign-in or a custom port.");
+  if (!["http:", "https:"].includes(url.protocol))
+    throw new GenerateError("FencePost works only with web pages, such as www.cmu.edu/example/.");
+  if (url.username || url.password)
+    throw new GenerateError("Leave the username and password out of the address.");
   return url;
 }
 
@@ -100,11 +122,14 @@ export async function publicFetch(
   input: string,
   allow?: (host: string) => boolean,
   redirects = 0,
+  // The page asking for it, passed on as the browser would: some embeds, such
+  // as YouTube's player, refuse to play without it
+  referer?: string,
 ): Promise<Fetched> {
   const url = publicUrl(input);
   if (allow && !allow(url.hostname))
     throw new GenerateError(
-      "FencePost makes previews for Carnegie Mellon sites. To add yours, request it.",
+      "FencePost works only with Carnegie Mellon sites. To add yours, use the Request a Domain form on the Reference page.",
       403,
     );
   const address = await resolvePublic(url.hostname);
@@ -113,6 +138,8 @@ export async function publicFetch(
     type: string;
     location?: string;
     status: number;
+    server?: string;
+    mitigated?: string;
   }>((resolve, reject) => {
     const req = (url.protocol === "https:" ? https : http).get(
       url,
@@ -120,7 +147,11 @@ export async function publicFetch(
         agent: false,
         family: address.family,
         lookup: (_host, _options, callback) => callback(null, address.address, address.family),
-        headers: { "User-Agent": USER_AGENT, "Accept-Encoding": "identity" },
+        headers: {
+          "User-Agent": USER_AGENT,
+          "Accept-Encoding": "identity",
+          ...(referer ? { Referer: referer } : {}),
+        },
       },
       (res) => {
         const chunks: Buffer[] = [];
@@ -138,6 +169,8 @@ export async function publicFetch(
             type: res.headers["content-type"] || "application/octet-stream",
             location: res.headers.location,
             status: res.statusCode || 502,
+            server: String(res.headers.server || ""),
+            mitigated: String(res.headers["cf-mitigated"] || ""),
           }),
         );
       },
@@ -150,12 +183,27 @@ export async function publicFetch(
       10000,
     );
     req.on("close", () => clearTimeout(deadline));
-    req.on("error", reject);
+    req.on("error", (e: NodeJS.ErrnoException) =>
+      reject(e instanceof GenerateError ? e : new GenerateError(networkMessage(e), 502)),
+    );
   });
   if (result.status >= 300 && result.status < 400 && result.location) {
     if (redirects >= 5) throw new GenerateError("The site redirects too many times.");
-    return publicFetch(new URL(result.location, url).href, allow, redirects + 1);
+    return publicFetch(new URL(result.location, url).href, allow, redirects + 1, referer);
   }
+  // Cloudflare's bot check answers a non-browser with a challenge page, not
+  // the site: say so, rather than blame a sign-in
+  if (
+    (result.status === 403 || result.status === 503) &&
+    /cloudflare/i.test(result.server || "") &&
+    (result.mitigated === "challenge" ||
+      /cf-chl|challenge-platform|Just a moment/i.test(result.body.toString("utf8")))
+  )
+    throw new GenerateError(
+      "This site uses Cloudflare to block automated visitors. FencePost can't see the page. Whoever manages the site's Cloudflare settings can let FencePost through; the Reference page says how.",
+      502,
+      "bot-check",
+    );
   if (result.status >= 400) {
     const answer = `The address returned ${result.status} ${STATUS_CODES[result.status] || "Error"}.`;
     throw new GenerateError(
@@ -184,6 +232,8 @@ export interface Capture {
   image: Buffer;
   title: string;
   description: string;
+  /** Where to crop it to 1200 × 630 from: the top (a page) or the middle */
+  position?: "top" | "centre";
 }
 
 let active = 0;
@@ -192,8 +242,10 @@ let active = 0;
  * project's cmu-web-preview.webp) */
 export const PREVIEW_SIZE = { width: 1200, height: 630 };
 export const GALLERY_SIZE = { width: 1040, height: 656 };
-/** A phone's screen (390 by 844) less its status bar, which statusbar.ts adds */
-export const PHONE_SIZE = { width: 390, height: 797 };
+/** The Web Kilt phone frame's screen (430 × 790, a larger phone's width)
+ *  less the status bar, which statusbar.ts adds, so the shot fills the frame
+ *  with nothing cut */
+export const PHONE_SIZE = { width: 430, height: 738 };
 
 // Screenshots the top of a public page, signed out, at a link preview's size
 // unless given another. The browser has no network of its own: every request
@@ -207,7 +259,7 @@ export async function capturePage(
 ): Promise<Capture> {
   publicUrl(input);
   if (active >= 2)
-    throw new GenerateError("Two previews are already in progress. Try again shortly.", 429);
+    throw new GenerateError("Two captures are already in progress. Try again shortly.", 429);
   active++;
   try {
     const page0 = await publicFetch(input, allow);
@@ -235,14 +287,15 @@ export async function capturePage(
           return;
         }
         const url = route.request().url();
+        const referer = route.request().headers()["referer"];
         try {
           // One retry: a dropped connection would leave the page unstyled
           const resource =
             url === page0.url
               ? page0
-              : await publicFetch(url).catch((e: unknown) => {
+              : await publicFetch(url, undefined, 0, referer).catch((e: unknown) => {
                   if (e instanceof GenerateError) throw e;
-                  return publicFetch(url);
+                  return publicFetch(url, undefined, 0, referer);
                 });
           await route.fulfill({ status: 200, contentType: resource.type, body: resource.body });
         } catch (e) {

@@ -5,8 +5,8 @@
 // (cmu-shot--phone) puts its camera over this bar.
 import sharp from "sharp";
 
-/** The status bar's height in CSS pixels */
-export const STATUS_BAR = 47;
+/** The status bar's height in CSS pixels, at 430 wide */
+export const STATUS_BAR = 52;
 
 type Rgb = [number, number, number];
 
@@ -27,7 +27,9 @@ export function inkFor(color: Rgb): string {
   return onWhite >= onDark ? "#fff" : "#1d2125";
 }
 
-/** The average color of the image's top edge */
+/** The most common color along the image's top edge: the roof's color, even
+ *  when a black search or menu block shares the edge (an average would mix
+ *  them into a color neither has) */
 export async function topColor(png: Buffer): Promise<Rgb> {
   const { width = 1 } = await sharp(png).metadata();
   const { data } = await sharp(png)
@@ -35,10 +37,19 @@ export async function topColor(png: Buffer): Promise<Rgb> {
     .removeAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
-  const sum = [0, 0, 0];
-  for (let i = 0; i < data.length; i += 3) for (let c = 0; c < 3; c++) sum[c] += data[i + c];
-  const n = data.length / 3;
-  return sum.map((v) => Math.round(v / n)) as Rgb;
+  const counts = new Map<string, number>();
+  let best = "0,0,0",
+    most = 0;
+  for (let i = 0; i < data.length; i += 3) {
+    const key = `${data[i]},${data[i + 1]},${data[i + 2]}`;
+    const n = (counts.get(key) || 0) + 1;
+    counts.set(key, n);
+    if (n > most) {
+      most = n;
+      best = key;
+    }
+  }
+  return best.split(",").map(Number) as Rgb;
 }
 
 /** The screenshot with a status bar above it, as PNG */

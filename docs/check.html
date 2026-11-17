@@ -12,7 +12,7 @@
     </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Check - FencePost - Carnegie Mellon University</title>
+    <title>Check a Link - FencePost - Carnegie Mellon University</title>
     <meta
       name="description"
       content="Check how a Carnegie Mellon page looks when it's shared, and what to fix."
@@ -46,15 +46,15 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/css/cmu-cms.css"
-      integrity="sha384-IY3Y+cmKYy4pjMLJRa/ynoPUYLNOgMbK4qImyQQocVvO6GTqVuKhIT6/olEUDi5e"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/css/cmu-cms.css"
+      integrity="sha384-zV4Oiwe8ikYWEc5ApP5p49KYu9glzcYVwoCr90Jw3csuQOQt9U/RRarEyL/ZvGgd"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/css/cmu-app.css"
-      integrity="sha384-2jLWqCd2cc1X5lySEjSIsY3mZhiKqacJc1fvAwSLjtSg3E13TJVOnpe9pAb8DMHP"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/css/cmu-app.css"
+      integrity="sha384-0k+Fq/HOfWMJfjLdEWk0w9Y9wf2SN+TAxLSCc5FtIYooZOQZOpAnhfe0fHre8ZCf"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
@@ -81,63 +81,92 @@
         </div>
       </header>
       <main id="content">
-        <div class="breadcrumbs"><a href="./">FencePost</a>&nbsp;&rsaquo;&nbsp;Check</div>
+        <div class="breadcrumbs"><a href="./">FencePost</a>&nbsp;&rsaquo;&nbsp;Check a Link</div>
         <div class="content wide">
           <div>
-            <h1>Check a Link</h1>
-            <p class="cmu-lead">
-              See how a Carnegie Mellon page looks when it's shared, and what to fix. FencePost
-              checks the page's tags and its preview image against the Web Kilt's
-              <a class="external" href="https://webkilt.andrew.cmu.edu/0/previews.html"
-                >Link Previews / Open Graph</a
-              >
-              standard.
-            </p>
-            <form id="fc-form" class="cmu-field-button">
-              <label for="fc-url" class="sr-only">Page Address</label
-              ><input
-                type="text"
-                inputmode="url"
-                id="fc-url"
-                required
-                placeholder="https://www.cmu.edu/your-site/"
-                maxlength="2048"
-              /><button class="btn" type="submit">Check the Link</button>
-            </form>
+            <h1>Is Your Link Ready to Share?</h1>
+            <p class="cmu-lead"
+              >See the preview people get when your link is shared, and what would make it
+              better.</p
+            >
             <div id="fc-status" role="status" aria-live="polite"></div>
-            <div class="cmu-split" id="fc-results" hidden>
+            <div class="cmu-split">
               <div>
-                <p class="cmu-label">When It's Shared</p>
-                <figure class="cmu-shot">
-                  <div class="cmu-link-preview">
-                    <img id="fc-image" alt="" width="1200" height="630" hidden />
-                    <div class="cmu-link-preview-text">
-                      <span id="fc-host"></span>
-                      <strong id="fc-title"></strong>
-                      <span id="fc-description"></span>
-                    </div>
+                <form id="fc-form">
+                  <label for="fc-url">Link</label>
+                  <div class="cmu-field-button">
+                    <input
+                      type="text"
+                      inputmode="url"
+                      id="fc-url"
+                      required
+                      placeholder="webkilt.andrew.cmu.edu"
+                      maxlength="2048"
+                      aria-describedby="fc-url-hint"
+                    />
+                    <button class="btn" type="submit">Check</button>
                   </div>
-                </figure>
-                <p class="cmu-hint">Each app lays it out its own way; this is a typical one.</p>
-              </div>
-              <div>
-                <div class="cmu-callout cmu-callout--gold" id="fc-fix-box" hidden>
-                  <p class="cmu-label">To Fix</p>
-                  <ul id="fc-fixes"></ul>
-                  <p id="fc-make" hidden>
-                    <a class="cta" id="fc-make-link" href="make.html"
-                      >Make a Preview for This Page</a
+                  <p class="cmu-hint" id="fc-url-hint"
+                    >Any public page within cmu.edu or an
+                    <a href="reference.html#sites">approved domain</a>.</p
+                  >
+                </form>
+                <div id="fc-results" hidden>
+                  <div id="fc-fix-box" hidden>
+                    <h3>To Fix</h3>
+                    <ul id="fc-fixes"></ul>
+                    <p
+                      ><a class="cta" id="fc-generate-link" href="generate.html"
+                        >Generate a Preview for This Page</a
+                      ></p
                     >
+                  </div>
+                  <div id="fc-notes-box" hidden>
+                    <h3>Worth Knowing</h3>
+                    <ul id="fc-notes"></ul>
+                  </div>
+                  <div id="fc-pass-box" hidden>
+                    <h3>Looks Good</h3>
+                    <ul class="cmu-checks" id="fc-passes"></ul>
+                  </div>
+                  <p id="fc-article-row" hidden>
+                    <strong>News story or post?</strong>
+                    <button type="button" class="btn small ghost" id="fc-article">
+                      Check It as One
+                    </button>
                   </p>
                 </div>
-                <div id="fc-notes-box" hidden>
-                  <p class="cmu-label">Worth Knowing</p>
-                  <ul id="fc-notes"></ul>
-                </div>
-                <div id="fc-pass-box" hidden>
-                  <p class="cmu-label">Looks Good</p>
-                  <ul class="cmu-checks" id="fc-passes"></ul>
-                </div>
+              </div>
+              <div>
+                <p class="cmu-label" id="fc-preview-label">Example Preview</p>
+                <div class="spinner" id="fc-spinner" hidden
+                  ><div class="double-bounce1"></div><div class="double-bounce2"></div
+                ></div>
+                <figure class="cmu-shot" id="fc-figure">
+                  <div class="cmu-link-preview">
+                    <img
+                      id="fc-image"
+                      src="https://webkilt.andrew.cmu.edu/0/images/preview.jpg"
+                      alt="An example preview: the Carnegie Mellon Web Kilt's home page."
+                      width="1200"
+                      height="630"
+                    />
+                    <div class="cmu-link-preview-text" id="fc-text">
+                      <span id="fc-site">Carnegie Mellon Web Kilt</span>
+                      <strong id="fc-title">Carnegie Mellon Web Kilt</strong>
+                      <span id="fc-description"
+                        >Components and working examples that fit CMU's web template, plus a few
+                        civilizing conveniences for app developers.</span
+                      >
+                    </div>
+                  </div>
+                  <figcaption id="fc-caption" hidden>
+                    <span id="fc-fallback" hidden></span>
+                    <span id="fc-image-note" hidden></span>
+                    Apps arrange previews differently; this preview shows the text and image
+                    FencePost found.
+                  </figcaption>
+                </figure>
               </div>
             </div>
           </div>
@@ -161,8 +190,9 @@
         <div>
           <nav id="nav"
             ><ul
-              ><li class="active"><a href="check.html" aria-current="page">Check</a></li
-              ><li><a href="make.html">Make</a></li
+              ><li class="active"><a href="check.html" aria-current="page">Check a Link</a></li
+              ><li><a href="generate.html">Generate a Preview</a></li
+              ><li><a href="screenshots.html">Take a Screenshot</a></li
               ><li><a href="reference.html">Reference</a></li
               ><li><a href="about.html">About</a></li></ul
             ></nav
@@ -174,8 +204,8 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
     <script
-      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/js/cmu-app.js"
-      integrity="sha384-kPYaRNjRAHnEY27lj3wKX2UTLNzxejzJWxXQ9pxOoRSmE2u7/p+KpJDix8iJedFe"
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/js/cmu-app.js"
+      integrity="sha384-OUj0Xw1O/00sPRbiU9tY0EIto5q/A7Nn7ZxhbEwk2B/5lcnAbLldNxyL52FO+MSK"
       crossorigin="anonymous"
     ></script>
     <script src="js/check.js"></script>

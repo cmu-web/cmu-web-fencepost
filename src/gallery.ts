@@ -1,19 +1,18 @@
-// CMU Web gallery shots: the top of a public page, signed out, with the menu
-// closed, as WebP. The same capture and site rules as a link preview.
-//   npm run gallery -- <address> [file.webp]           1040 x 656, the size
-//     of each project's cmu-web-preview.webp
-//   npm run gallery -- <address> [file.webp] --phone   390 x 844 at double
-//     resolution, with a status bar, for the Web Kilt's phone frame
+// Screenshots from the command line, the same as the Screenshots page: the
+// top of a public page, signed out, with the menu closed, as WebP, or as
+// PNG or JPEG when the file name ends in .png or .jpg.
+//   npm run gallery -- <address> [file.webp]           a 1040 × 656 card, the
+//     size of each project's cmu-web-preview.webp
+//   npm run gallery -- <address> [file.webp] --phone   430 × 790 at double
+//     resolution, with a status bar, the Web Kilt phone frame's screen
 import { writeFile } from "node:fs/promises";
-import sharp from "sharp";
-import { capturePage, GALLERY_SIZE, PHONE_SIZE } from "./capture";
-import { allowedHost, loadDomains } from "./domains";
-import { withStatusBar } from "./statusbar";
+import { loadDomains } from "./domains";
+import { makeScreenshot } from "./screenshot";
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
-  const phone = args.includes("--phone");
-  const [address, file = phone ? "phone.webp" : "gallery.webp"] = args.filter(
+  const kind = args.includes("--phone") ? "phone" : "card";
+  const [address, file = kind === "phone" ? "phone.webp" : "gallery.webp"] = args.filter(
     (a) => a !== "--phone",
   );
   if (!address) {
@@ -21,13 +20,12 @@ async function main(): Promise<void> {
     process.exitCode = 2;
     return;
   }
-  const domains = loadDomains();
-  const allow = (host: string) => allowedHost(host, domains);
-  const shot = phone
-    ? await capturePage(address, allow, PHONE_SIZE, 2)
-    : await capturePage(address, allow, GALLERY_SIZE);
-  const image = phone ? await withStatusBar(shot.image, 2) : shot.image;
-  await writeFile(file, await sharp(image).webp({ quality: 85 }).toBuffer());
+  const shot = await makeScreenshot(address, kind, loadDomains());
+  // The file's extension picks the format: .webp (the default), .png or .jpg
+  const ext = file.split(".").pop()?.toLowerCase();
+  const pick =
+    shot.images.find((f) => f.file.endsWith(`.${ext === "jpeg" ? "jpg" : ext}`)) ?? shot.images[0];
+  await writeFile(file, pick.image);
   console.log(`Wrote ${file}: ${shot.title}`);
 }
 

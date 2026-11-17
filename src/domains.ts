@@ -6,7 +6,6 @@ export interface Domain {
   domain: string;
   subdomains?: boolean;
   group: string;
-  contact: string;
   added: string;
   request: string;
 }

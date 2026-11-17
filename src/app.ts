@@ -4,6 +4,8 @@ import { checkLink, type Fetcher } from "./check";
 import { allowedHost, loadDomains, type Domain } from "./domains";
 import { mountMcp } from "./mcp";
 import { makePreview, type Capturer } from "./preview";
+import { makeScreenshot } from "./screenshot";
+import { withScheme } from "./capture";
 import { GenerateError } from "./shared";
 
 export function createApp(
@@ -21,16 +23,17 @@ export function createApp(
   app.post("/api/preview", express.json({ limit: "12mb" }), async (req, res) => {
     try {
       const body = (req.body ?? {}) as Record<string, unknown>;
-      if (typeof body.url !== "string") throw new GenerateError("Enter the page's address.");
+      if (typeof body.url !== "string") throw new GenerateError("Enter a link to a page.");
       const str = (k: string) => (typeof body[k] === "string" ? (body[k] as string) : undefined);
       const preview = await makePreview(
         {
-          url: body.url,
+          url: withScheme(body.url),
           title: str("title"),
           description: str("description"),
           site: str("site"),
           imagePath: str("imagePath"),
           screenshot: str("screenshot"),
+          imageUrl: str("imageUrl"),
         },
         domains,
         capture,
@@ -43,29 +46,74 @@ export function createApp(
         title: preview.title,
         description: preview.description,
         tags: preview.tags,
+        ...(preview.linked !== undefined
+          ? { linked: preview.linked, imageFixes: preview.imageFixes ?? [] }
+          : {}),
       });
     } catch (e) {
       const known = e instanceof GenerateError;
       if (!known) console.error("preview failed:", (e as Error).message);
       res.status(known ? e.status : 500).json({
         error: known ? e.message : "That preview didn't work. Try again, or upload a screenshot.",
+        ...(known && e.code ? { code: e.code } : {}),
+      });
+    }
+  });
+  // A card or phone screenshot as JSON, in WebP, PNG and JPEG (base64)
+  app.post("/api/screenshot", express.json({ limit: "8kb" }), async (req, res) => {
+    try {
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      if (typeof body.url !== "string") throw new GenerateError("Enter a link to a page.");
+      const shot = await makeScreenshot(
+        withScheme(body.url),
+        typeof body.kind === "string" ? body.kind : "card",
+        domains,
+        capture,
+      );
+      res.set("Cache-Control", "no-store").json({
+        width: shot.width,
+        height: shot.height,
+        title: shot.title,
+        images: shot.images.map((f) => ({
+          format: f.format,
+          type: f.type,
+          file: f.file,
+          bytes: f.image.length,
+          image: f.image.toString("base64"),
+        })),
+      });
+    } catch (e) {
+      const known = e instanceof GenerateError;
+      if (!known) console.error("screenshot failed:", (e as Error).message);
+      res.status(known ? e.status : 500).json({
+        error: known ? e.message : "That screenshot didn't work. Try again.",
+        ...(known && e.code ? { code: e.code } : {}),
       });
     }
   });
   // A page's preview tags and image, checked against the Link Previews standard
   app.post("/api/check", express.json({ limit: "8kb" }), async (req, res) => {
     try {
-      const url = (req.body as Record<string, unknown> | undefined)?.url;
-      if (typeof url !== "string") throw new GenerateError("Enter the page's address.");
+      const body = (req.body as Record<string, unknown> | undefined) ?? {};
+      const url = body.url;
+      if (typeof url !== "string") throw new GenerateError("Enter a link to a page.");
       res
         .set("Cache-Control", "no-store")
-        .json(await checkLink(url, (host) => allowedHost(host, domains), fetcher));
+        .json(
+          await checkLink(
+            withScheme(url),
+            (host) => allowedHost(host, domains),
+            fetcher,
+            body.article === true,
+          ),
+        );
     } catch (e) {
       const known = e instanceof GenerateError;
       if (!known) console.error("check failed:", (e as Error).message);
-      res
-        .status(known ? e.status : 500)
-        .json({ error: known ? e.message : "That check didn't work. Try again." });
+      res.status(known ? e.status : 500).json({
+        error: known ? e.message : "That check didn't work. Try again.",
+        ...(known && e.code ? { code: e.code } : {}),
+      });
     }
   });
   mountMcp(app, domains, capture, fetcher);

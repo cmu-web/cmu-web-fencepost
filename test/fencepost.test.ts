@@ -4,16 +4,16 @@ import { inkFor, STATUS_BAR, topColor, withStatusBar } from "../src/statusbar";
 import { describe, expect, it } from "vitest";
 import { createApp } from "../src/app";
 import { card, openGraph } from "../src/card";
-import { publicAddress, publicFetch, publicUrl, tracker } from "../src/capture";
+import { publicAddress, publicFetch, publicUrl, tracker, withScheme } from "../src/capture";
 import { checkLink, STANDARD, readTags, type Fetcher } from "../src/check";
 import { allowedHost, type Domain } from "../src/domains";
-import type { Capturer } from "../src/preview";
+import { imageFixes, type Capturer } from "../src/preview";
 import { GenerateError } from "../src/shared";
+import { fileStem } from "../src/screenshot";
 
 const abtech: Domain = {
   domain: "abtech.org",
   group: "AB Tech",
-  contact: "Andrew Carnegie (ac00)",
   added: "2026-11-14",
   request: "https://github.com/cmu-web/cmu-web-fencepost/issues/1",
 };
@@ -45,15 +45,14 @@ describe("which sites FencePost captures", () => {
     expect(allowedHost("shop.abtech.org", [{ ...abtech, subdomains: true }])).toBe(true);
   });
 
-  it("refuses credentials, custom ports and other schemes", () => {
-    for (const url of [
-      "ftp://www.cmu.edu/",
-      "https://ac00:secret@www.cmu.edu/",
-      "https://www.cmu.edu:8443/",
-      "not a url",
-    ])
-      expect(() => publicUrl(url)).toThrow();
+  it("refuses credentials and other schemes, but takes any port", () => {
+    expect(() => publicUrl("ftp://www.cmu.edu/")).toThrow(/web pages/);
+    expect(() => publicUrl("https://ac00:secret@www.cmu.edu/")).toThrow(/username and password/);
+    expect(() => publicUrl("not a url")).toThrow(/link/);
     expect(publicUrl("https://www.cmu.edu/").hostname).toBe("www.cmu.edu");
+    expect(publicUrl("https://www.cmu.edu:8443/").port).toBe("8443");
+    expect(withScheme("www.cmu.edu:8443/example/")).toBe("https://www.cmu.edu:8443/example/");
+    expect(withScheme("http://www.cmu.edu/")).toBe("http://www.cmu.edu/");
   });
 
   it("treats only ordinary internet addresses as public", () => {
@@ -76,7 +75,7 @@ describe("which sites FencePost captures", () => {
 });
 
 describe("the preview", () => {
-  it("is a 1200 x 630 JPEG under 300 KB", async () => {
+  it("is a 1200 × 630 JPEG under 300 KB", async () => {
     const image = await card(await screenshot());
     expect(image.length).toBeLessThanOrEqual(300_000);
     expect(await sharp(image).metadata()).toMatchObject({
@@ -98,9 +97,38 @@ describe("the preview", () => {
       '<meta property="og:image" content="https://www.cmu.edu/example/images/preview.jpg" />',
     );
     expect(tags).toContain("Andrew &quot;AC&quot; Carnegie");
-    expect(tags).toContain("&lt;b&gt;");
+    expect(tags).toContain("&lt;b>");
+    expect(tags).toContain('content="A screenshot of Andrew &quot;AC&quot; Carnegie."');
     expect(tags).toContain('name="twitter:card" content="summary_large_image"');
     expect(tags).not.toContain("—");
+  });
+
+  it("keeps apostrophes and names the page in the alt text", () => {
+    const tags = openGraph({
+      url: "https://www.cmu.edu/example/",
+      title: "Andrew Carnegie's Page - Made Up - Carnegie Mellon University",
+      description: "CMU's made-up page.",
+      site: "Made Up",
+      imagePath: "/images/preview.jpg",
+    });
+    expect(tags).toContain("CMU's made-up page.");
+    expect(tags).toContain('content="A screenshot of Andrew Carnegie\'s Page."');
+  });
+});
+
+describe("an image link", () => {
+  const image = (w: number, h: number, format: "jpeg" | "png") => {
+    const base = sharp({ create: { width: w, height: h, channels: 3, background: "#c41230" } });
+    return (format === "jpeg" ? base.jpeg() : base.png()).toBuffer();
+  };
+  it("passes a 1200 x 630 JPEG under 300 KB as it is", async () => {
+    expect(await imageFixes(await image(1200, 630, "jpeg"))).toEqual([]);
+  });
+  it("says what's off with any other image", async () => {
+    const fixes = await imageFixes(await image(2400, 1260, "png"));
+    expect(fixes).toHaveLength(2);
+    expect(fixes[0]).toContain("2400 × 1260");
+    expect(fixes[1]).toContain("PNG");
   });
 });
 
@@ -131,14 +159,85 @@ describe("the API", () => {
     expect(res.body.title).toBe("Made Up");
   });
 
+  it("adds https:// to an address typed without it", async () => {
+    const res = await request(app)
+      .post("/api/preview")
+      .send({ url: "www.cmu.edu/example/" })
+      .expect(200);
+    expect(res.body.tags).toContain("https://www.cmu.edu/example/");
+  });
+
   it("says what's wrong in plain words", async () => {
     const missing = await request(app).post("/api/preview").send({}).expect(400);
-    expect(missing.body.error).toMatch(/address/);
+    expect(missing.body.error).toMatch(/link/);
     const noTitle = await request(app)
       .post("/api/preview")
       .send({ url: "https://www.cmu.edu/", screenshot: "aGk=" })
       .expect(400);
     expect(noTitle.body.error).toMatch(/title/);
+  });
+
+  it("names screenshot files for the page's site and path", () => {
+    expect(fileStem("https://www.cmu.edu/", "phone")).toBe("cmu-edu-phone");
+    expect(fileStem("https://www.cmu.edu/teaching/", "card")).toBe("cmu-edu-teaching-card");
+    expect(fileStem("https://webkilt.andrew.cmu.edu/0/index.html", "card")).toBe(
+      "webkilt-andrew-cmu-edu-0-index-card",
+    );
+    expect(fileStem("https://www.cmu.edu/" + "a".repeat(100), "phone").length).toBeLessThanOrEqual(
+      66,
+    );
+    expect(fileStem("not a url", "phone")).toBe("page-phone");
+  });
+
+  it("makes a card and a phone screenshot at their exact sizes", async () => {
+    const card = await request(app)
+      .post("/api/screenshot")
+      .send({ url: "https://www.cmu.edu/example/", kind: "card" })
+      .expect(200);
+    expect(card.body).toMatchObject({ width: 1040, height: 656 });
+    expect(card.body.images[0]).toMatchObject({
+      format: "webp",
+      file: "cmu-edu-example-card.webp",
+    });
+    const phone = await request(app)
+      .post("/api/screenshot")
+      .send({ url: "https://www.cmu.edu/example/", kind: "phone" })
+      .expect(200);
+    expect(phone.body).toMatchObject({ width: 860, height: 1580 });
+    // All three formats, each the real thing at the full size
+    const files = phone.body.images as {
+      format: string;
+      file: string;
+      type: string;
+      bytes: number;
+      image: string;
+    }[];
+    expect(files.map((f) => f.file)).toEqual([
+      "cmu-edu-example-phone.webp",
+      "cmu-edu-example-phone.png",
+      "cmu-edu-example-phone.jpg",
+    ]);
+    for (const f of files) {
+      const image = Buffer.from(f.image, "base64");
+      expect(image.length).toBe(f.bytes);
+      expect(await sharp(image).metadata()).toMatchObject({
+        format: f.format,
+        width: 860,
+        height: 1580,
+      });
+    }
+  });
+
+  it("refuses a screenshot of a site it doesn't capture", async () => {
+    const res = await request(app)
+      .post("/api/screenshot")
+      .send({ url: "https://example.com/", kind: "phone" });
+    expect(res.status).toBeGreaterThanOrEqual(400);
+    const bad = await request(app)
+      .post("/api/screenshot")
+      .send({ url: "https://www.cmu.edu/", kind: "poster" })
+      .expect(400);
+    expect(bad.body.error).toMatch(/card or a phone/);
   });
 
   it("answers health checks and serves MCP over POST only", async () => {
@@ -158,7 +257,7 @@ describe("the link checker", () => {
     async (url, allow) => {
       const u = new URL(url);
       if (allow && !allow(u.hostname))
-        throw new GenerateError("FencePost makes previews for Carnegie Mellon sites.", 403);
+        throw new GenerateError("FencePost works only with Carnegie Mellon sites.", 403);
       if (pages[u.href])
         return { body: Buffer.from(pages[u.href]), type: "text/html", url: u.href };
       if (images[u.href]) return { body: await images[u.href], type: "image/jpeg", url: u.href };
@@ -177,8 +276,19 @@ describe("the link checker", () => {
     <meta property="og:title" content="Bare">
     <meta property="og:title" content="Bare Again">
     <meta property="og:image" content="/images/big.jpg"></head></html>`;
+  // A news story with no date or author, and a page in /news/ that isn't
+  // marked as an article
+  const story = good
+    .replace('content="website"', 'content="article"')
+    .replace("https://www.cmu.edu/made-up/", "https://www.cmu.edu/news/story/");
+  const unmarked = good.replace("https://www.cmu.edu/made-up/", "https://www.cmu.edu/news/other/");
   const fetcher = site(
-    { "https://www.cmu.edu/made-up/": good, "https://www.cmu.edu/bare/": bad },
+    {
+      "https://www.cmu.edu/made-up/": good,
+      "https://www.cmu.edu/bare/": bad,
+      "https://www.cmu.edu/news/story/": story,
+      "https://www.cmu.edu/news/other/": unmarked,
+    },
     {
       "https://www.cmu.edu/made-up/images/preview.jpg": jpeg(1200, 630),
       "https://www.cmu.edu/images/big.jpg": jpeg(900, 600),
@@ -191,6 +301,21 @@ describe("the link checker", () => {
     expect(r.findings.filter((f) => f.status !== "pass")).toEqual([]);
     expect(r.title).toBe("Example & More - Made Up");
     expect(r.image).toMatchObject({ width: 1200, height: 630, format: "jpeg" });
+  });
+
+  it("checks an article's type, date and author when asked, and only then", async () => {
+    // The page says it's an article: missing date and author are notes
+    const marked = await checkLink("https://www.cmu.edu/news/story/", allow, fetcher);
+    const notes = marked.findings.filter((f) => f.status === "note");
+    expect(notes.map((f) => f.tag)).toEqual(["article:published_time", "article:author"]);
+    expect(notes[0].standard?.url).toMatch(/#articles$/);
+    // The person says it's an article: everything missing is a fix
+    const asked = await checkLink("https://www.cmu.edu/news/other/", allow, fetcher, true);
+    const fixes = asked.findings.filter((f) => f.status === "fix").map((f) => f.tag);
+    expect(fixes).toEqual(["og:type", "article:published_time", "article:author"]);
+    // Neither: no article checks, even with news in the address
+    const page = await checkLink("https://www.cmu.edu/news/other/", allow, fetcher);
+    expect(page.findings.some((f) => f.key.startsWith("article"))).toBe(false);
   });
 
   it("says what to fix on a page that doesn't", async () => {
@@ -208,7 +333,7 @@ describe("the link checker", () => {
         "card",
       ]),
     );
-    expect(r.findings.find((f) => f.key === "image-size")?.text).toContain("900 by 600");
+    expect(r.findings.find((f) => f.key === "image-size")?.text).toContain("900 × 600");
   });
 
   it("links each fix to its section of the standard, and no pass", async () => {
@@ -248,6 +373,27 @@ describe("phone status bar", () => {
     expect(inkFor([196, 18, 48])).toBe("#fff");
     expect(inkFor([109, 110, 113])).toBe("#fff");
     expect(inkFor([255, 255, 255])).toBe("#1d2125");
+  });
+
+  it("takes the top edge's most common color, not an average", async () => {
+    // A red roof with a black block at the right, as on some sites
+    const page = await sharp({
+      create: { width: 780, height: 100, channels: 3, background: { r: 196, g: 18, b: 48 } },
+    })
+      .composite([
+        {
+          input: await sharp({
+            create: { width: 300, height: 100, channels: 3, background: { r: 0, g: 0, b: 0 } },
+          })
+            .png()
+            .toBuffer(),
+          left: 480,
+          top: 0,
+        },
+      ])
+      .png()
+      .toBuffer();
+    expect(await topColor(page)).toEqual([196, 18, 48]);
   });
 
   it("adds the bar above the page in the page's top color", async () => {

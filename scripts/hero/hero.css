@@ -1,0 +1,315 @@
+/* Styles for the two made-up pages in FencePost's hero; the site itself
+   uses only template and kit CSS */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font:
+    24px Arial,
+    sans-serif;
+  color: #24282c;
+}
+.status {
+  height: 54px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 28px;
+  font-size: 20px;
+  font-weight: bold;
+}
+.icons {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.contact {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 24px 18px;
+  background: white;
+  border-bottom: 1px solid #e0e3e6;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #e7e9eb;
+  color: #66717a;
+  font-size: 20px;
+  font-weight: bold;
+}
+.name {
+  font-size: 26px;
+  font-weight: bold;
+}
+.online {
+  font-size: 18px;
+  color: #78838b;
+  margin-top: 3px;
+}
+.chat {
+  padding: 18px;
+}
+.date {
+  margin: 0 0 18px;
+  color: #8a9298;
+  text-align: center;
+  font-size: 16px;
+}
+.message {
+  width: fit-content;
+  max-width: 90%;
+  padding: 13px 17px;
+  border-radius: 24px;
+  background: #eaecef;
+  margin: 0 0 14px;
+  line-height: 1.3;
+}
+.reply {
+  margin-left: auto;
+  color: white;
+  background: #305f9b;
+}
+.preview {
+  overflow: hidden;
+  border: 1px solid #d4d9de;
+  border-radius: 22px;
+  background: white;
+  margin-top: 20px;
+}
+.preview img {
+  display: block;
+  width: 100%;
+}
+.details {
+  padding: 16px 18px 20px;
+}
+.domain {
+  color: #737b83;
+  font-size: 20px;
+  margin: 0 0 9px;
+}
+.title {
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: bold;
+}
+.description {
+  margin: 0;
+  color: #626a71;
+  font-size: 22px;
+  line-height: 1.3;
+}
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 18px 18px;
+}
+.url {
+  flex: 1;
+  padding: 13px 17px;
+  background: white;
+  border: 1px solid #d4d9de;
+  border-radius: 30px;
+  font-size: 21px;
+}
+.send {
+  display: grid;
+  place-items: center;
+  background: #305f9b;
+  color: white;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 28px;
+}
+/* Handshake Lemma: a white header with a neon green wordmark */
+.network {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 16px 25px;
+  background: white;
+  border-bottom: 1px solid #d6dde3;
+}
+.network-logo {
+  color: #6fbf1a;
+  font-size: 32px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.search {
+  padding: 10px 18px;
+  border-radius: 5px;
+  background: #edf3f8;
+  color: #66717a;
+  width: 150px;
+  font-size: 18px;
+}
+.nav {
+  color: #65717b;
+  font-size: 17px;
+  word-spacing: 18px;
+}
+.post {
+  margin: 0;
+  border: 1px solid #d7dce1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+}
+.post-author {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 24px 22px 14px;
+}
+.post-avatar {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  background: #dfe8ef;
+  color: #405b72;
+  border-radius: 50%;
+  font-weight: bold;
+}
+.post-name {
+  font-size: 23px;
+  font-weight: bold;
+}
+.post-meta {
+  color: #747f89;
+  font-size: 17px;
+  margin-top: 4px;
+}
+.post-copy {
+  padding: 0 22px 20px;
+  margin: 0;
+  line-height: 1.4;
+  max-width: 690px;
+}
+.post-image {
+  display: block;
+  width: 100%;
+}
+.post-link {
+  background: #edf3f7;
+  padding: 18px 22px;
+}
+.post-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 0 7px;
+}
+.post-domain {
+  color: #727d86;
+  font-size: 18px;
+  margin: 0;
+}
+.post-actions {
+  padding: 20px 22px;
+  color: #687580;
+  font-size: 18px;
+  word-spacing: 22px;
+  border-top: 1px solid #dce2e7;
+}
+/* Each page is one screenshot: the network page as a browser window's
+   content (4:3), the chat as a phone's screen (430 by 790) */
+.network-page {
+  background: #edf0f3;
+  font-size: 22px;
+}
+.chat-page {
+  background: #f8fafc;
+}
+/* The feed: the post in a narrower column and, on the right, a box to start
+   a post over a profile card, as networks lay out their feeds, so the whole
+   post fits the 4:3 shot */
+.feed-page {
+  display: grid;
+  grid-template-columns: 1fr 210px;
+  gap: 22px;
+  align-items: start;
+  padding: 22px 25px;
+}
+.me {
+  padding: 22px 16px;
+  border: 1px solid #d7dce1;
+  border-radius: 12px;
+  background: white;
+  text-align: center;
+  font-size: 16px;
+}
+.me-avatar {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: #e4ece4;
+  color: #44624a;
+  font-weight: bold;
+  font-size: 22px;
+}
+.me-name {
+  margin: 0 0 4px;
+  font-size: 19px;
+  font-weight: bold;
+}
+.me-meta {
+  margin: 0 0 16px;
+  color: #747f89;
+  font-size: 15px;
+}
+.me-stat {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 9px 0 0;
+  border-top: 1px solid #e3e7ea;
+  color: #687580;
+  font-size: 14px;
+}
+.me-stat b {
+  color: #2c6db3;
+}
+.side {
+  display: grid;
+  gap: 16px;
+}
+.compose {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #d7dce1;
+  border-radius: 12px;
+  background: white;
+}
+.me-avatar--small {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.compose-box {
+  flex: 1;
+  padding: 9px 14px;
+  border: 1px solid #c9d0d6;
+  border-radius: 20px;
+  color: #7a858e;
+  font-size: 15px;
+}

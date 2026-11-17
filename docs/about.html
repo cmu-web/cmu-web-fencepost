@@ -46,8 +46,8 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/css/cmu-cms.css"
-      integrity="sha384-IY3Y+cmKYy4pjMLJRa/ynoPUYLNOgMbK4qImyQQocVvO6GTqVuKhIT6/olEUDi5e"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/css/cmu-cms.css"
+      integrity="sha384-zV4Oiwe8ikYWEc5ApP5p49KYu9glzcYVwoCr90Jw3csuQOQt9U/RRarEyL/ZvGgd"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
@@ -79,17 +79,20 @@
           <div>
             <h1>About FencePost</h1>
             <p class="cmu-lead">
-              FencePost makes link previews for Carnegie Mellon websites. It's named for the Fence,
-              where students paint what they want everyone to see.
+              FencePost gets Carnegie Mellon pages ready to share: it checks their link previews,
+              makes new ones and takes screenshots. It's named for the Fence, where students paint
+              what they want everyone to see.
             </p>
             <h2 id="how" class="rule-top">How It Works</h2>
             <p>
-              FencePost opens your page in a browser, signed out, and captures the top at 1200 by
-              630, the size link previews use. It follows the Carnegie Mellon Web Kilt's
+              FencePost opens your page in a browser, as an unauthenticated visitor on the public
+              internet, and captures the top at 1200 &times; 630, the size link previews use. It
+              follows the Carnegie Mellon Web Kilt's
               <a class="external" href="https://webkilt.andrew.cmu.edu/0/previews.html"
                 >Link Previews / Open Graph</a
               >
-              standard.
+              standard. For a screenshot, it captures a card at 1040 &times; 656 or a phone screen
+              at 430 &times; 790.
             </p>
             <ul class="cmu-checks">
               <li>
@@ -108,7 +111,7 @@
             <h2 id="contributing" class="rule-top">Contributing to FencePost</h2>
             <p>
               FencePost is a TypeScript app built with Express. It captures pages with
-              <a class="external" href="https://playwright.dev/">Playwright</a> and makes the JPEG
+              <a class="external" href="https://playwright.dev/">Playwright</a> and makes the images
               with <a class="external" href="https://sharp.pixelplumbing.com/">sharp</a>.
             </p>
             <p>
@@ -121,11 +124,11 @@
             </p>
           </div>
         </div>
-        <div class="grid column3 grey boxes">
+        <div class="grid column4 grey boxes">
           <h1 id="cmu-web">More From CMU Web</h1>
           <p class="cmu-grid-full"
-            >FencePost is part of CMU Web, a collection of projects for Carnegie Mellon web
-            development.</p
+            >FencePost is part of <a class="external" href="https://cmu-web.github.io/">CMU Web</a>,
+            a collection of projects for Carnegie Mellon web development.</p
           >
           <p class="cmu-label cmu-grid-full">Tools for Any Site or App</p>
           <div>
@@ -172,6 +175,26 @@
             <p
               >QR codes with Carnegie Mellon character, from Scotty portraits to campus
               landmarks.</p
+            >
+          </div>
+          <div>
+            <figure class="cmu-shot cmu-shot--browser">
+              <a href="https://cutandpaste.andrew.cmu.edu/" tabindex="-1" aria-hidden="true"
+                ><img
+                  src="https://cutandpaste.andrew.cmu.edu/images/cmu-web-preview.webp"
+                  alt="The Cut &amp; Paste's home page."
+                  width="1040"
+                  height="656"
+              /></a>
+            </figure>
+            <h2
+              ><a class="external" href="https://cutandpaste.andrew.cmu.edu/"
+                >The Cut &amp; Paste</a
+              ></h2
+            >
+            <p
+              >Banners, headers and icons for tools you use at CMU, sized and cropped in CMU
+              style.</p
             >
           </div>
           <p class="cmu-label cmu-grid-full">Themes for Other Platforms</p>
@@ -258,8 +281,9 @@
         <div>
           <nav id="nav"
             ><ul
-              ><li><a href="check.html">Check</a></li
-              ><li><a href="make.html">Make</a></li
+              ><li><a href="check.html">Check a Link</a></li
+              ><li><a href="generate.html">Generate a Preview</a></li
+              ><li><a href="screenshots.html">Take a Screenshot</a></li
               ><li><a href="reference.html">Reference</a></li
               ><li class="active"><a href="about.html" aria-current="page">About</a></li></ul
             ></nav
@@ -271,8 +295,8 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
     <script
-      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/js/cmu-app.js"
-      integrity="sha384-kPYaRNjRAHnEY27lj3wKX2UTLNzxejzJWxXQ9pxOoRSmE2u7/p+KpJDix8iJedFe"
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/js/cmu-app.js"
+      integrity="sha384-OUj0Xw1O/00sPRbiU9tY0EIto5q/A7Nn7ZxhbEwk2B/5lcnAbLldNxyL52FO+MSK"
       crossorigin="anonymous"
     ></script>
   </body>

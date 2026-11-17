@@ -5,9 +5,10 @@ body:
   - type: markdown
     attributes:
       value: >-
-        FencePost makes previews for any public page on cmu.edu. Other domains
+        FencePost generates previews for any public page on cmu.edu. Other domains
         are added for sites run by a Carnegie Mellon department, center, office
-        or recognized student organization.
+        or recognized student organization. This issue is public, so leave out
+        names and Andrew IDs; we'll ask the group for a contact privately.
   - type: input
     id: domain
     attributes:
@@ -29,13 +30,6 @@ body:
     attributes:
       label: Carnegie Mellon Group
       description: The department, center, office or student organization that runs the site.
-    validations:
-      required: true
-  - type: input
-    id: contact
-    attributes:
-      label: Contact
-      description: A name and Andrew ID we can ask about the site, now and later.
     validations:
       required: true
   - type: textarea

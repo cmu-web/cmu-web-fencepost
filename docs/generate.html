@@ -12,19 +12,19 @@
     </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Make - FencePost - Carnegie Mellon University</title>
+    <title>Generate a Preview - FencePost - Carnegie Mellon University</title>
     <meta
       name="description"
-      content="Make a link preview for a Carnegie Mellon page: a 1200 by 630 image and its Open Graph tags."
+      content="Generate a link preview for a Carnegie Mellon page: a 1200 &times; 630 image and its Open Graph tags."
     />
     <!-- Link previews, following the Web Kilt's Link Previews / Open Graph standard -->
     <meta property="og:site_name" content="FencePost" />
-    <meta property="og:title" content="Make a Preview - FencePost" />
+    <meta property="og:title" content="Generate a Preview - FencePost" />
     <meta
       property="og:description"
-      content="Make a link preview for a Carnegie Mellon page: a 1200 by 630 image and its Open Graph tags."
+      content="Generate a link preview for a Carnegie Mellon page: a 1200 &times; 630 image and its Open Graph tags."
     />
-    <meta property="og:url" content="https://fencepost.andrew.cmu.edu/make.html" />
+    <meta property="og:url" content="https://fencepost.andrew.cmu.edu/generate.html" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://fencepost.andrew.cmu.edu/images/preview.jpg" />
     <meta property="og:image:width" content="1200" />
@@ -46,15 +46,15 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/css/cmu-cms.css"
-      integrity="sha384-IY3Y+cmKYy4pjMLJRa/ynoPUYLNOgMbK4qImyQQocVvO6GTqVuKhIT6/olEUDi5e"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/css/cmu-cms.css"
+      integrity="sha384-zV4Oiwe8ikYWEc5ApP5p49KYu9glzcYVwoCr90Jw3csuQOQt9U/RRarEyL/ZvGgd"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/css/cmu-app.css"
-      integrity="sha384-2jLWqCd2cc1X5lySEjSIsY3mZhiKqacJc1fvAwSLjtSg3E13TJVOnpe9pAb8DMHP"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/css/cmu-app.css"
+      integrity="sha384-0k+Fq/HOfWMJfjLdEWk0w9Y9wf2SN+TAxLSCc5FtIYooZOQZOpAnhfe0fHre8ZCf"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
@@ -81,103 +81,204 @@
         </div>
       </header>
       <main id="content">
-        <div class="breadcrumbs"><a href="./">FencePost</a>&nbsp;&rsaquo;&nbsp;Make</div>
+        <div class="breadcrumbs"
+          ><a href="./">FencePost</a>&nbsp;&rsaquo;&nbsp;Generate a Preview</div
+        >
         <div class="content wide">
           <div>
-            <h1>Make a Preview</h1>
-            <p class="cmu-lead">
-              Enter a public Carnegie Mellon page, or upload a screenshot of it. FencePost makes a
-              1200 by 630 JPEG under 300 KB and the tags for your page's head.
-            </p>
+            <h1>Ready to Generate a Preview?</h1>
+            <p class="cmu-lead"
+              >Generate a preview image and the Open Graph tags for a Carnegie Mellon page.</p
+            >
             <div id="fp-status" role="status" aria-live="polite"></div>
             <div class="cmu-split">
               <form id="fp-form">
-                <label for="fp-url">Page Address</label
-                ><input
+                <label for="fp-url">Link</label>
+                <input
                   type="text"
                   inputmode="url"
                   id="fp-url"
                   required
-                  placeholder="https://www.cmu.edu/your-site/"
+                  placeholder="forbesandmoreword.andrew.cmu.edu/news/"
                   maxlength="2048"
                   aria-describedby="fp-url-hint"
                 />
-                <p class="cmu-hint" id="fp-url-hint">
-                  A public page on cmu.edu or an approved Carnegie Mellon domain. FencePost views it
-                  signed out.
-                </p>
-                <label for="fp-file">Screenshot (Optional)</label
-                ><input
-                  type="file"
-                  id="fp-file"
-                  accept="image/png,image/jpeg,image/webp"
-                  aria-describedby="fp-file-hint"
-                />
-                <p class="cmu-hint" id="fp-file-hint">
-                  A PNG, JPEG or WebP under 8 MB, for a page FencePost can't view, such as one
-                  behind a sign-in. Use made-up names and data in it. Leave it blank to capture the
-                  page.
-                </p>
-                <label for="fp-title">Title</label
-                ><input
+                <p class="cmu-hint" id="fp-url-hint"
+                  >Any public page within cmu.edu or an
+                  <a href="reference.html#sites">approved domain</a>.</p
+                >
+
+                <label for="fp-site">Site Name</label>
+                <input
                   type="text"
-                  id="fp-title"
-                  maxlength="100"
-                  aria-describedby="fp-title-hint"
+                  id="fp-site"
+                  maxlength="60"
+                  required
+                  placeholder="Forbes &amp; Moreword"
+                  aria-describedby="fp-site-hint"
                 />
-                <p class="cmu-hint" id="fp-title-hint">
-                  Leave it blank to use the page's own title. Required with a screenshot.
-                </p>
-                <label for="fp-description">Description</label
-                ><textarea
+                <p class="cmu-hint" id="fp-site-hint">Some apps show it with the title.</p>
+                <label for="fp-description">Description</label>
+                <textarea
                   id="fp-description"
                   rows="3"
                   maxlength="220"
+                  placeholder="Releases and new patterns for the Forbes &amp; Moreword theme."
                   aria-describedby="fp-description-hint"
                 ></textarea>
-                <p class="cmu-hint" id="fp-description-hint">
-                  Leave it blank to use the page's own description.
+                <p class="cmu-hint" id="fp-description-hint"
+                  >A short sentence about the page. Leave this empty to use its own, or write one if
+                  you upload an image.</p
+                >
+                <label for="fp-source">Image</label>
+                <select id="fp-source" data-cmu-options aria-describedby="fp-source-hint">
+                  <option value="capture" selected>Capture the Page</option>
+                  <option value="upload">Upload an Image</option>
+                  <option value="link">Use an Image Link</option>
+                </select>
+                <p class="cmu-hint" id="fp-source-hint">
+                  FencePost takes the top of the page. Upload an image for a page it can't see, or
+                  link to one you already have.
                 </p>
-                <label for="fp-site">Site Name</label
-                ><input type="text" id="fp-site" maxlength="60" aria-describedby="fp-site-hint" />
-                <p class="cmu-hint" id="fp-site-hint">
-                  The site's name, such as Equipment Checkout. Some apps show it with the title.
-                </p>
-                <label for="fp-path">Image Path on Your Site</label
-                ><input
-                  type="text"
-                  id="fp-path"
-                  value="/images/preview.jpg"
-                  required
-                  maxlength="2048"
-                  aria-describedby="fp-path-hint"
-                />
-                <p class="cmu-hint" id="fp-path-hint">
-                  Where you'll save the image. The tags point to it.
-                </p>
-                <p><button class="btn" type="submit">Make the Preview</button></p>
-                <p class="cmu-hint">
-                  Once your page is live with the new tags, <a href="check.html">check the link</a>.
-                </p>
+                <hr />
+                <div data-cmu-option="link upload" hidden>
+                  <label for="fp-title">Page Title</label>
+                  <input
+                    type="text"
+                    id="fp-title"
+                    maxlength="100"
+                    placeholder="Example WordPress News Block"
+                    aria-describedby="fp-title-hint"
+                  />
+                  <p class="cmu-hint" id="fp-title-hint"
+                    >Leave this empty to use the page's title. With an upload, write one.</p
+                  >
+                </div>
+                <div data-cmu-option="link" hidden>
+                  <label for="fp-image-url">Image Link</label>
+                  <input
+                    type="text"
+                    inputmode="url"
+                    id="fp-image-url"
+                    maxlength="2048"
+                    placeholder="forbesandmoreword.andrew.cmu.edu/images/preview.jpg"
+                    aria-describedby="fp-image-url-hint"
+                  />
+                  <p class="cmu-hint" id="fp-image-url-hint">
+                    An image within cmu.edu or an approved domain. FencePost crops it to 1200
+                    &times; 630 from the middle, so start close to that shape.
+                  </p>
+                </div>
+                <div data-cmu-option="upload" hidden>
+                  <label class="cmu-drop" for="fp-file">
+                    <input
+                      type="file"
+                      id="fp-file"
+                      accept="image/png,image/jpeg,image/webp"
+                      aria-describedby="fp-file-hint"
+                    />
+                    <span
+                      >Drag the image here, or
+                      <span class="cmu-drop-pick">choose a file</span></span
+                    >
+                    <span class="cmu-drop-file"></span>
+                  </label>
+                  <p class="cmu-hint" id="fp-file-hint"
+                    >A PNG, JPEG or WebP under 8 MB, such as a screenshot of an app behind a
+                    sign-in, with made-up names and data.</p
+                  >
+                  <p
+                    ><button class="btn ghost" type="button" id="fp-clear-file" hidden
+                      >Clear the Screenshot</button
+                    ></p
+                  >
+                </div>
+                <div id="fp-path-box" data-cmu-option="capture upload">
+                  <label for="fp-path">Image Location</label>
+                  <input
+                    type="text"
+                    id="fp-path"
+                    value="/images/preview.jpg"
+                    required
+                    maxlength="2048"
+                    aria-describedby="fp-path-hint"
+                  />
+                  <p class="cmu-hint" id="fp-path-hint"
+                    >Where the image will go on your site. The tags point here; you upload the file
+                    yourself.</p
+                  >
+                </div>
+                <p><button class="btn" type="submit">Generate the Preview</button></p>
               </form>
               <div>
-                <p class="cmu-label">Preview</p>
-                <figure class="cmu-shot" id="fp-figure" hidden>
-                  <img id="fp-preview" alt="The link preview image." width="1200" height="630" />
+                <p class="cmu-label" id="fp-result-title" tabindex="-1">Example Preview</p>
+                <div class="spinner" id="fp-spinner" hidden
+                  ><div class="double-bounce1"></div><div class="double-bounce2"></div
+                ></div>
+                <figure class="cmu-shot" id="fp-figure">
+                  <div class="cmu-link-preview">
+                    <img
+                      id="fp-preview"
+                      src="images/example-generate.jpg"
+                      alt="An example preview: Forbes &amp; Moreword's News page."
+                      width="1200"
+                      height="630"
+                    />
+                    <div class="cmu-link-preview-text">
+                      <span id="fp-card-site">Forbes &amp; Moreword</span>
+                      <strong id="fp-card-title">Example WordPress News Block</strong>
+                      <span id="fp-card-description"
+                        >Releases and new patterns for the Forbes &amp; Moreword theme.</span
+                      >
+                    </div>
+                  </div>
+                  <figcaption>A JPEG, 1200 &times; 630 pixels and under 300 KB.</figcaption>
                 </figure>
                 <div id="fp-actions" hidden>
-                  <p><a class="btn" id="fp-download" download="preview.jpg">Download JPEG</a></p>
-                  <p class="cmu-label">Tags for Your Page's Head</p>
+                  <p id="fp-linked" hidden
+                    >Your image already meets the standard, so the tags point to it. There's nothing
+                    to save.</p
+                  >
+                  <div id="fp-save">
+                    <h3>Save the Image</h3>
+                    <div id="fp-image-fixes" hidden>
+                      <p>Your image can't be used as it is, so here's a fixed copy:</p>
+                      <ul id="fp-image-fix-list"></ul>
+                    </div>
+                    <p
+                      >Upload the JPEG to
+                      <code class="cmu-snippet--wrap" id="fp-save-path">/images/preview.jpg</code>
+                      on your site.</p
+                    >
+                    <p
+                      ><a class="btn" id="fp-download" download="preview.jpg"
+                        >Download the Image</a
+                      ></p
+                    >
+                  </div>
+                  <h3>Add the Tags</h3>
+                  <p
+                    >Include these tags in the page's <code>&lt;head&gt;</code>, replacing any
+                    existing copies of the same tags.</p
+                  >
                   <div class="cmu-copyable">
-                    <pre class="cmu-snippet cmu-snippet--wrap"><code id="fp-tags"></code></pre
-                    ><button
+                    <pre class="cmu-snippet"><code id="fp-tags"></code></pre>
+                    <button
                       type="button"
                       class="cmu-copy"
                       data-cmu-copy="#fp-tags"
-                      aria-label="Copy Code"
-                      title="Copy Code"
+                      aria-label="Copy the Tags"
+                      title="Copy the Tags"
                     ></button>
                   </div>
+                  <p class="cmu-hint"
+                    >If your CMS writes these tags, update its social sharing settings instead. See
+                    <a href="reference.html#open-graph">Open Graph Tags</a> for details.</p
+                  >
+                  <p
+                    >After publishing the image and tags,
+                    <a class="cta" id="fp-check-link" href="check.html">Check the Link</a></p
+                  >
                 </div>
               </div>
             </div>
@@ -202,8 +303,10 @@
         <div>
           <nav id="nav"
             ><ul
-              ><li><a href="check.html">Check</a></li
-              ><li class="active"><a href="make.html" aria-current="page">Make</a></li
+              ><li><a href="check.html">Check a Link</a></li
+              ><li class="active"
+                ><a href="generate.html" aria-current="page">Generate a Preview</a></li
+              ><li><a href="screenshots.html">Take a Screenshot</a></li
               ><li><a href="reference.html">Reference</a></li
               ><li><a href="about.html">About</a></li></ul
             ></nav
@@ -215,10 +318,10 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
     <script
-      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/js/cmu-app.js"
-      integrity="sha384-kPYaRNjRAHnEY27lj3wKX2UTLNzxejzJWxXQ9pxOoRSmE2u7/p+KpJDix8iJedFe"
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/js/cmu-app.js"
+      integrity="sha384-OUj0Xw1O/00sPRbiU9tY0EIto5q/A7Nn7ZxhbEwk2B/5lcnAbLldNxyL52FO+MSK"
       crossorigin="anonymous"
     ></script>
-    <script src="js/make.js"></script>
+    <script src="js/generate.js"></script>
   </body>
 </html>

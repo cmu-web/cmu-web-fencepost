@@ -1,1 +1,93 @@
-[]
+[
+  {
+    "domain": "abtech.org",
+    "subdomains": true,
+    "group": "AB Tech",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "activitiesboard.org",
+    "subdomains": true,
+    "group": "Activities Board",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "springcarnival.org",
+    "subdomains": true,
+    "group": "Spring Carnival Committee",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "scottylabs.org",
+    "subdomains": true,
+    "group": "ScottyLabs",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "scotchnsoda.org",
+    "subdomains": true,
+    "group": "Scotch'n'Soda Theatre",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "cmubuggy.org",
+    "subdomains": true,
+    "group": "CMU Buggy Alumni Association",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "roboclub.org",
+    "subdomains": true,
+    "group": "Robotics Club",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "thetartan.org",
+    "subdomains": true,
+    "group": "The Tartan",
+    "added": "2026-11-17",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "wrct.org",
+    "subdomains": true,
+    "group": "WRCT",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "tartanhacks.com",
+    "subdomains": true,
+    "group": "ScottyLabs (TartanHacks)",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "psc.edu",
+    "subdomains": true,
+    "group": "Pittsburgh Supercomputing Center",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "merichar.org",
+    "subdomains": true,
+    "group": "Employee Perks",
+    "added": "2026-11-16",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  },
+  {
+    "domain": "w3vc.org",
+    "subdomains": true,
+    "group": "Carnegie Tech Radio Club",
+    "added": "2026-11-17",
+    "request": "https://github.com/cmu-web/cmu-web-fencepost/pull/STARTER"
+  }
+]

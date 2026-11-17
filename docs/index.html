@@ -15,14 +15,14 @@
     <title>FencePost - Carnegie Mellon University</title>
     <meta
       name="description"
-      content="Link previews for Carnegie Mellon websites: the image and the Open Graph tags."
+      content="Check and make link previews for Carnegie Mellon websites, and take screenshots of their pages."
     />
     <!-- Link previews, following the Web Kilt's Link Previews / Open Graph standard -->
     <meta property="og:site_name" content="FencePost" />
     <meta property="og:title" content="FencePost" />
     <meta
       property="og:description"
-      content="Link previews for Carnegie Mellon websites: the image and the Open Graph tags."
+      content="Check and make link previews for Carnegie Mellon websites, and take screenshots of their pages."
     />
     <meta property="og:url" content="https://fencepost.andrew.cmu.edu/" />
     <meta property="og:type" content="website" />
@@ -46,15 +46,15 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/css/cmu-cms.css"
-      integrity="sha384-IY3Y+cmKYy4pjMLJRa/ynoPUYLNOgMbK4qImyQQocVvO6GTqVuKhIT6/olEUDi5e"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/css/cmu-cms.css"
+      integrity="sha384-zV4Oiwe8ikYWEc5ApP5p49KYu9glzcYVwoCr90Jw3csuQOQt9U/RRarEyL/ZvGgd"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/css/cmu-app.css"
-      integrity="sha384-2jLWqCd2cc1X5lySEjSIsY3mZhiKqacJc1fvAwSLjtSg3E13TJVOnpe9pAb8DMHP"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/css/cmu-app.css"
+      integrity="sha384-0k+Fq/HOfWMJfjLdEWk0w9Y9wf2SN+TAxLSCc5FtIYooZOQZOpAnhfe0fHre8ZCf"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
@@ -87,127 +87,91 @@
               <div>
                 <h1>Put Your Best Page Forward</h1>
                 <p class="cmu-lead"
-                  >See how your Carnegie Mellon page looks when someone shares it, then make the
-                  preview image and tags it's missing.</p
+                  >When someone shares your link in Slack, Teams or social media, its link preview
+                  is the first thing people see. FencePost shows you that preview and lets you fix
+                  the image and tags to get it right.</p
                 >
                 <div class="cmu-cta-row">
                   <a class="btn" href="check.html">Check a Link</a>
                   <a class="cta" href="#get-started">Get Started</a>
                 </div>
               </div>
-              <div class="aligncenter">
+              <div class="cmu-hero-art cmu-hero-art--phone" data-cmu-address="handshakelemma">
                 <img
-                  src="images/hero.webp"
-                  alt="A phone showing a chat with Margaret Morrison. A link to the Carnegie Mellon Web Kilt is about to be sent, with its preview above the message: the Kilt's home page, its site, title and description."
-                  width="420"
-                  height="702"
+                  src="images/hero-browser.webp"
+                  alt="Andrew Mellon's post on Handshake Lemma, a made-up professional network, with a link preview for the Carnegie Mellon Web Kilt."
+                  width="1740"
+                  height="1306"
                 />
+                <figure class="cmu-shot cmu-shot--phone">
+                  <img
+                    src="images/hero-phone.webp"
+                    alt="A phone chat in which Margaret Morrison is sent the same link, with its preview."
+                    width="860"
+                    height="1580"
+                  />
+                </figure>
               </div>
             </div> </div
         ></div>
         <div class="content wide"
           ><div>
             <h1 id="get-started">Get Started</h1>
-            <div class="cmu-paths cmu-paths--two">
-              <a class="cmu-path" href="check.html">
-                <strong>Is Your Link Ready to Share?</strong>
-                <span>See how your page looks when it's shared, and what to fix.</span>
-                <span class="cta">Check a Link</span>
-              </a>
-              <a class="cmu-path" href="make.html">
-                <strong>Missing a Preview Image?</strong>
-                <span>Create the image and the tags your page is missing.</span>
-                <span class="cta">Make a Preview</span>
-              </a>
-            </div>
-          </div></div
-        >
-        <div class="content wide"
-          ><div>
-            <h1 id="prepare" class="rule-top">Prepare Your Site</h1>
             <ol class="cmu-flow">
               <li
-                ><strong>Make the Image</strong>A 1200 by 630 JPEG of the top of your home page,
-                under 300 KB. Take the screenshot yourself, or
-                <a href="make.html">let FencePost make it</a>. Save it as
-                <code>images/preview.jpg</code> in your site's top folder.</li
+                ><strong>Make the Image</strong>A 1200 &times; 630 pixel JPEG, under 300 KB, hosted
+                on your site (e.g., <code>https://cmu.edu/nachos/images/<wbr />preview.jpg</code>).
+                Take it yourself or <a href="generate.html">let FencePost generate it</a>.</li
               >
               <li
-                ><strong>Add the Tags</strong>Put the Open Graph tags below in each page's
-                <code>&lt;head&gt;</code>. In Cascade, choose the image as the site's Social Media
-                Image instead; the template writes the tags.</li
+                ><strong>Add the Tags</strong>
+                <p>
+                  Include <a href="reference.html#open-graph">Open Graph tags</a> that provide the
+                  page's title, description and address in the <code>&lt;head&gt;</code> of each
+                  page.
+                </p>
+                <p>
+                  <strong>Using a CMS?</strong> The Web Kilt's
+                  <a class="external" href="https://webkilt.andrew.cmu.edu/0/previews.html#tags"
+                    >guidance</a
+                  >
+                  covers that.
+                </p></li
               >
               <li
-                ><strong>Check the Link</strong>Publish, then
-                <a href="check.html">check a page's address</a>. Fix anything FencePost flags before
-                you share it.</li
+                ><strong>Check the Link</strong>Run the link through
+                <a href="check.html">the checker</a> and fix any problems before you share it. Apps
+                cache a link's preview for a while once it's shared, so a fix made later can take
+                days to show.</li
               >
             </ol>
-          </div></div
-        >
-        <div class="content wide"
-          ><div>
-            <h1 id="open-graph" class="rule-top">What Is Open Graph?</h1>
-            <p>
-              Open Graph is a set of <code>&lt;meta&gt;</code> tags, first defined by Facebook in
-              2010, that describe a page to the apps that build link previews: Slack, Teams,
-              LinkedIn, iMessage and most chat and social apps. Without them, an app guesses, and
-              often shows only the page's title or a stray image from the page.
-            </p>
-            <div class="cmu-copyable">
-              <pre
-                class="cmu-snippet cmu-snippet--wrap"
-              ><code id="fp-og-example">&lt;meta property="og:site_name" content="Equipment Checkout"&gt;
-&lt;meta property="og:title" content="Reserve a Camera Kit - Equipment Checkout"&gt;
-&lt;meta property="og:description" content="Cameras, laptops and lights, free for CMU courses."&gt;
-&lt;meta property="og:url" content="https://www.cmu.edu/equipment/reserve.html"&gt;
-&lt;meta property="og:type" content="website"&gt;
-&lt;meta property="og:image" content="https://www.cmu.edu/equipment/images/preview.jpg"&gt;
-&lt;meta property="og:image:width" content="1200"&gt;
-&lt;meta property="og:image:height" content="630"&gt;
-&lt;meta property="og:image:alt" content="Equipment Checkout's home page: Reserve a Camera Kit, beside a photo of a camera kit."&gt;
-&lt;meta name="twitter:card" content="summary_large_image"&gt;</code></pre
-              ><button
-                type="button"
-                class="cmu-copy"
-                data-cmu-copy="#fp-og-example"
-                aria-label="Copy Code"
-                title="Copy Code"
-              ></button>
+            <h2 id="next" class="rule-top">Ready for Wherever Your Page Goes Next</h2>
+            <div class="cmu-paths">
+              <a class="cmu-path" href="check.html">
+                <strong>Is Your Link Ready to Share?</strong>
+                <span
+                  >Check the image, title and description people see when it's shared, and get a
+                  list of what to fix.</span
+                >
+                <span class="cta">Check a Link</span>
+              </a>
+              <a class="cmu-path" href="generate.html">
+                <strong>Ready to Generate a Preview?</strong>
+                <span
+                  >Get a 1200 &times; 630 pixel image and the Open Graph tags for your page's
+                  head.</span
+                >
+                <span class="cta">Generate a Preview</span>
+              </a>
+              <a class="cmu-path" href="screenshots.html">
+                <strong>Showing Off Your Site?</strong>
+                <span
+                  >Get your page as a mobile view for a mockup or as a card for the CMU Web
+                  Gallery.</span
+                >
+                <span class="cta">Take a Screenshot</span>
+              </a>
             </div>
-            <ul>
-              <li>
-                <strong><code>og:title</code> and <code>og:description</code></strong> are the bold
-                title and the line under it.
-              </li>
-              <li>
-                <strong><code>og:image</code></strong> is the picture, 1200 by 630, and
-                <code>og:image:alt</code> describes it for screen readers.
-              </li>
-              <li>
-                <strong><code>og:url</code></strong> is the page's full address, so shares of the
-                same page count as one.
-              </li>
-              <li>
-                <strong><code>og:site_name</code></strong> is the site's name, which some apps show
-                with the title.
-              </li>
-              <li>
-                <strong><code>twitter:card</code></strong> set to
-                <code>summary_large_image</code> asks for the large picture instead of a thumbnail.
-              </li>
-            </ul>
-            <p>
-              The Web Kilt's
-              <a class="external" href="https://webkilt.andrew.cmu.edu/0/previews.html"
-                >Link Previews / Open Graph</a
-              >
-              page has the full standard, including how to add the tags in a CMS or an app.
-            </p>
-          </div></div
-        >
-        <div class="content wide"
-          ><div>
             <!-- prettier-ignore -->
             <div class="cmu-agent">
               <h2 id="agent" class="rule-top">Set Up With an AI Agent</h2>
@@ -238,8 +202,9 @@
         <div>
           <nav id="nav"
             ><ul
-              ><li><a href="check.html">Check</a></li
-              ><li><a href="make.html">Make</a></li
+              ><li><a href="check.html">Check a Link</a></li
+              ><li><a href="generate.html">Generate a Preview</a></li
+              ><li><a href="screenshots.html">Take a Screenshot</a></li
               ><li><a href="reference.html">Reference</a></li
               ><li><a href="about.html">About</a></li></ul
             ></nav
@@ -251,8 +216,8 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
     <script
-      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/js/cmu-app.js"
-      integrity="sha384-kPYaRNjRAHnEY27lj3wKX2UTLNzxejzJWxXQ9pxOoRSmE2u7/p+KpJDix8iJedFe"
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/js/cmu-app.js"
+      integrity="sha384-OUj0Xw1O/00sPRbiU9tY0EIto5q/A7Nn7ZxhbEwk2B/5lcnAbLldNxyL52FO+MSK"
       crossorigin="anonymous"
     ></script>
   </body>

@@ -24,7 +24,7 @@ export function createMcp(
     { name: "fencepost", title: "FencePost", version },
     {
       instructions:
-        "Check a page's link preview with check_link, or make one with generate_preview: a 1200 x 630 JPEG under 300 KB and the Open Graph tags. Save the image with the site, at imagePath, before publishing the tags. FencePost captures cmu.edu pages and approved Carnegie Mellon domains, signed out, and stores nothing.",
+        "Check a page's link preview with check_link, or generate one with generate_preview: a 1200 × 630 JPEG under 300 KB and the Open Graph tags. Save the image with the site, at imagePath, before publishing the tags. FencePost captures cmu.edu pages and approved Carnegie Mellon domains, signed out, and stores nothing.",
     },
   );
   server.registerTool(
@@ -38,7 +38,7 @@ export function createMcp(
       content: [
         {
           type: "text",
-          text: `check_link takes url and reports what a share would show and what to fix. generate_preview takes url (a public page on cmu.edu or an approved Carnegie Mellon domain), and optionally title (up to ${LIMITS.title} characters), description (up to ${LIMITS.description}), site (the site's name, up to ${LIMITS.site}), imagePath (where the site will host the image, default /images/preview.jpg) and screenshot (base64 PNG, JPEG or WebP under 8 MB, to skip the capture). It returns the JPEG and the tags; nothing is stored. Pages are captured signed out, so a page behind a sign-in fails; upload a screenshot instead. Approved domains: ${domains.map((d) => d.domain).join(", ") || "none yet"}. To add one, use the Request a Domain form in the GitHub repository. Full reference: ${base}/reference.html.`,
+          text: `check_link takes url and reports what a share would show and what to fix. generate_preview takes url (a public page on cmu.edu or an approved Carnegie Mellon domain), and optionally title (up to ${LIMITS.title} characters), description (up to ${LIMITS.description}), site (the site's name, up to ${LIMITS.site}), imagePath (where the site will host the image, default /images/preview.jpg), screenshot (base64 PNG, JPEG or WebP under 8 MB, to skip the capture) and imageUrl (a link to an existing image on the same sites, used instead of a capture: if it's already 1200 × 630, a JPEG and under 300 KB, the tags point to it and there's nothing to save; otherwise it's cropped to a new JPEG to save, and imageFixes says why). It returns the JPEG and the tags; nothing is stored. Pages are captured signed out, so a page behind a sign-in fails; upload a screenshot instead. Approved domains: ${domains.map((d) => d.domain).join(", ") || "none yet"}. To add one, use the Request a Domain form in the GitHub repository. Full reference: ${base}/reference.html.`,
         },
       ],
     }),
@@ -48,13 +48,18 @@ export function createMcp(
     {
       title: "Check a Link",
       description:
-        "Read a public Carnegie Mellon page's Open Graph tags and preview image, and check them against the Web Kilt's Link Previews / Open Graph standard. Returns what a share would show and what to fix.",
-      inputSchema: { url: z.string().url().max(2048) },
+        "Read a public Carnegie Mellon page's Open Graph tags and preview image, and check them against the Web Kilt's Link Previews / Open Graph standard. Set article to true for a news story or post, to check its type, date and author. Returns what a share would show and what to fix.",
+      inputSchema: { url: z.string().url().max(2048), article: z.boolean().optional() },
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
-    async ({ url }) => {
+    async ({ url, article }) => {
       try {
-        const result = await checkLink(url, (host) => allowedHost(host, domains), fetcher);
+        const result = await checkLink(
+          url,
+          (host) => allowedHost(host, domains),
+          fetcher,
+          article === true,
+        );
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       } catch (e) {
         return {
@@ -74,7 +79,7 @@ export function createMcp(
     {
       title: "Make a Link Preview",
       description:
-        "Capture a public Carnegie Mellon page, or use a base64 screenshot, and return a 1200 x 630 JPEG under 300 KB with its Open Graph tags. Save the image with the site; FencePost stores nothing.",
+        "Capture a public Carnegie Mellon page, or use a base64 screenshot, and return a 1200 × 630 JPEG under 300 KB with its Open Graph tags. Save the image with the site; FencePost stores nothing.",
       inputSchema: {
         url: z.string().url().max(2048),
         title: z.string().max(LIMITS.title).optional(),
@@ -82,6 +87,7 @@ export function createMcp(
         site: z.string().max(LIMITS.site).optional(),
         imagePath: z.string().max(2048).optional(),
         screenshot: z.string().max(11_200_000).optional(),
+        imageUrl: z.string().max(2048).optional(),
       },
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
@@ -94,12 +100,19 @@ export function createMcp(
             {
               type: "text",
               text: JSON.stringify(
-                {
-                  saveAs: args.imagePath || "/images/preview.jpg",
-                  width: 1200,
-                  height: 630,
-                  tags: preview.tags,
-                },
+                preview.linked
+                  ? {
+                      linked: true,
+                      note: "The image already meets the standard; the tags point to it, so there's nothing to save.",
+                      tags: preview.tags,
+                    }
+                  : {
+                      saveAs: args.imagePath || "/images/preview.jpg",
+                      width: 1200,
+                      height: 630,
+                      ...(preview.imageFixes ? { imageFixes: preview.imageFixes } : {}),
+                      tags: preview.tags,
+                    },
                 null,
                 2,
               ),

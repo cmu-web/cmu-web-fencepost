@@ -43,8 +43,8 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/css/cmu-cms.css"
-      integrity="sha384-IY3Y+cmKYy4pjMLJRa/ynoPUYLNOgMbK4qImyQQocVvO6GTqVuKhIT6/olEUDi5e"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/css/cmu-cms.css"
+      integrity="sha384-zV4Oiwe8ikYWEc5ApP5p49KYu9glzcYVwoCr90Jw3csuQOQt9U/RRarEyL/ZvGgd"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
@@ -76,45 +76,463 @@
           <div>
             <h1>FencePost Reference</h1>
             <p class="cmu-lead">
-              Check or make a link preview with the API or an MCP tool call. Both work the same way
-              as the Check and Make pages.
+              How FencePost checks link previews, which sites it can capture and how to use its API
+              and MCP tools. The API supports all three tools; MCP supports checking links and
+              generating previews.
             </p>
-            <h2 id="sites" class="rule-top">Which Sites It Captures</h2>
+          </div>
+        </div>
+        <div class="grid column3 nav cmu-on-this-page">
+          <p class="cmu-label">On This Page</p>
+          <div>
+            <div class="nav-list">
+              <ul>
+                <li><a href="#open-graph">Open Graph Tags</a></li>
+                <li><a href="#sites">Approved Sites</a></li>
+                <li><a href="#api">API</a></li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="nav-list">
+              <ul>
+                <li><a href="#fields">Preview Fields</a></li>
+                <li><a href="#mcp">MCP Server</a></li>
+                <li><a href="#wordpress">WordPress Plugin</a></li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="nav-list">
+              <ul>
+                <li><a href="#errors">Errors</a></li>
+                <li><a href="#cloudflare">Sites Behind Cloudflare</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="content wide">
+          <div>
+            <h2 id="open-graph" class="rule-top">Open Graph Tags</h2>
             <p>
-              Any public page on cmu.edu or one of its subdomains, or on a Carnegie Mellon domain on
-              FencePost's
-              <a
-                class="external"
-                href="https://github.com/cmu-web/cmu-web-fencepost/blob/main/domains.json"
-                >list of approved domains</a
-              >. To add a site that isn't on cmu.edu, use the
+              Open Graph is a set of <code>&lt;meta&gt;</code> tags, first defined by Facebook in
+              2010, that describe a page to the apps that build link previews: Slack, Teams,
+              LinkedIn, iMessage and most chat and social apps. Without them, an app guesses, and
+              often shows only the page's title or a stray image from the page.
+            </p>
+            <div class="cmu-copyable">
+              <pre
+                class="cmu-snippet"
+              ><code id="fp-og-example">&lt;meta property="og:site_name" content="Classroom Booking"&gt;
+&lt;meta property="og:title" content="Reserve a Classroom - Classroom Booking"&gt;
+&lt;meta property="og:description" content="Find a room for a review session or a guest talk, with the seats and screens you need."&gt;
+&lt;meta property="og:url" content="https://www.cmu.edu/classrooms/reserve.html"&gt;
+&lt;meta property="og:type" content="website"&gt;
+&lt;meta property="og:image" content="https://www.cmu.edu/classrooms/images/preview.jpg"&gt;
+&lt;meta property="og:image:width" content="1200"&gt;
+&lt;meta property="og:image:height" content="630"&gt;
+&lt;meta property="og:image:alt" content="Classroom Booking's home page: Reserve a Classroom, beside a photo of a classroom."&gt;
+&lt;meta name="twitter:card" content="summary_large_image"&gt;</code></pre
+              ><button
+                type="button"
+                class="cmu-copy"
+                data-cmu-copy="#fp-og-example"
+                aria-label="Copy Code"
+                title="Copy Code"
+              ></button>
+            </div>
+            <table class="alternate cmu-full">
+              <thead
+                ><tr><th scope="col">Tag</th><th scope="col">What It Is</th></tr></thead
+              >
+              <tbody>
+                <tr
+                  ><th scope="row"><code>og:title</code>, <code>og:description</code></th
+                  ><td>The bold title and the line under it.</td></tr
+                >
+                <tr
+                  ><th scope="row"><code>og:image</code>, <code>og:image:alt</code></th
+                  ><td
+                    >The picture, 1200 &times; 630 pixels, and its description for screen
+                    readers.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row"><code>og:url</code></th
+                  ><td
+                    >The page's preferred address, which apps use instead of the exact link someone
+                    pasted.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row"><code>og:site_name</code></th
+                  ><td>The site's name, which some apps show with the title.</td></tr
+                >
+                <tr
+                  ><th scope="row"><code>twitter:card</code></th
+                  ><td
+                    ><code>summary_large_image</code> asks for the large picture instead of a
+                    thumbnail.</td
+                  ></tr
+                >
+              </tbody>
+            </table>
+            <p>
+              The Web Kilt's
+              <a class="external" href="https://webkilt.andrew.cmu.edu/0/previews.html"
+                >Link Previews / Open Graph</a
+              >
+              page has the full guidance, including how to add the tags in a CMS or an app.
+            </p>
+            <h2 id="sites" class="rule-top">Approved Sites</h2>
+            <p>
+              FencePost works with any public page on cmu.edu or one of its subdomains, and on these
+              sites run by Carnegie Mellon groups:
+            </p>
+            <!-- domains:start -->
+            <table class="alternate cmu-full"
+              ><thead
+                ><tr><th scope="col">Group</th><th scope="col">Site</th></tr></thead
+              ><tbody>
+                <tr
+                  ><th scope="row">AB Tech</th
+                  ><td><code>abtech.org</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">Activities Board</th
+                  ><td><code>activitiesboard.org</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">Carnegie Tech Radio Club</th
+                  ><td><code>w3vc.org</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">CMU Buggy Alumni Association</th
+                  ><td><code>cmubuggy.org</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">Employee Perks</th
+                  ><td><code>merichar.org</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">Pittsburgh Supercomputing Center</th
+                  ><td><code>psc.edu</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">Robotics Club</th
+                  ><td><code>roboclub.org</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">Scotch'n'Soda Theatre</th
+                  ><td><code>scotchnsoda.org</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">ScottyLabs</th
+                  ><td><code>scottylabs.org</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">ScottyLabs (TartanHacks)</th
+                  ><td><code>tartanhacks.com</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">Spring Carnival Committee</th
+                  ><td><code>springcarnival.org</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">The Tartan</th
+                  ><td><code>thetartan.org</code> and its subdomains</td></tr
+                >
+                <tr
+                  ><th scope="row">WRCT</th><td><code>wrct.org</code> and its subdomains</td></tr
+                >
+              </tbody></table
+            >
+            <!-- domains:end -->
+            <p>
+              To add a site that isn't on cmu.edu, use the
               <a
                 class="external"
                 href="https://github.com/cmu-web/cmu-web-fencepost/issues/new?template=domain_request.yml"
                 >Request a Domain</a
               >
-              form. FencePost views pages signed out, through public DNS, and refuses private
-              addresses, so a page behind a sign-in or only on campus fails; upload a screenshot
-              instead.
+              form. FencePost sees only what anyone on the public internet can: it doesn't sign in,
+              and it can't reach pages that work only on campus. For those, upload a screenshot in
+              <a href="generate.html">Generate a Preview</a>.
             </p>
             <h2 id="api" class="rule-top">API</h2>
             <p>
-              <code>POST /api/check</code> with JSON: <code>url</code>. It returns what a share
-              would show (title, description, site name and image) and a list of findings, each
-              <code>pass</code>, <code>fix</code> or <code>note</code>.
+              Each endpoint takes JSON and answers with JSON. Images come back as base64; nothing is
+              stored.
             </p>
+            <table class="alternate cmu-full">
+              <thead
+                ><tr
+                  ><th scope="col">Request</th><th scope="col">Body</th
+                  ><th scope="col">Response</th></tr
+                ></thead
+              >
+              <tbody>
+                <tr
+                  ><th scope="row"><code>POST /api/check</code></th
+                  ><td><code>url</code>, and <code>article: true</code> for a news story or post</td
+                  ><td
+                    >What a share would show (<code>title</code>, <code>description</code>,
+                    <code>siteName</code>, <code>image</code>, <code>imageAlt</code>) and
+                    <code>findings</code>, each <code>pass</code>, <code>fix</code> or
+                    <code>note</code></td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row"><code>POST /api/preview</code></th
+                  ><td><code>url</code> and the <a href="#fields">preview fields</a></td
+                  ><td
+                    >The 1200 &times; 630 pixel JPEG (<code>image</code>), its <code>title</code>,
+                    <code>description</code> and the <code>tags</code> for the page's head</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row"><code>POST /api/screenshot</code></th
+                  ><td
+                    ><code>url</code> and <code>kind</code>: <code>card</code> (the default) or
+                    <code>phone</code></td
+                  ><td
+                    >Its <code>width</code>, <code>height</code> and <code>title</code>, and
+                    <code>images</code>: the screenshot as WebP, PNG and JPEG, each with its
+                    <code>format</code>, <code>type</code>, <code>file</code> name,
+                    <code>bytes</code> and base64 <code>image</code></td
+                  ></tr
+                >
+              </tbody>
+            </table>
             <p>
-              <code>POST /api/preview</code> with JSON: <code>url</code> (required),
-              <code>title</code>, <code>description</code>, <code>site</code>,
-              <code>imagePath</code> (default <code>/images/preview.jpg</code>) and
-              <code>screenshot</code> (base64, skips the capture). It returns the JPEG as base64
-              with the tags. Nothing is stored.
+              To try it from a terminal, send a page's address with <code>curl</code>. This example
+              checks the Web Kilt's home page:
             </p>
-            <h2 id="mcp" class="rule-top">MCP Tools</h2>
+            <pre
+              class="cmu-snippet"
+            ><code>curl -s https://fencepost.andrew.cmu.edu/api/check -H 'Content-Type: application/json' -d '{"url": "https://webkilt.andrew.cmu.edu/"}'</code></pre>
             <p>
-              The server at <code>https://fencepost.andrew.cmu.edu/mcp</code> (Streamable HTTP, no
-              sign-in) has <code>get_guide</code>, <code>check_link</code> and
-              <code>generate_preview</code>, which take the same fields as the API.
+              FencePost follows the redirect to <code>/0/</code> and answers with what a share would
+              show, then a finding for each check. Shortened, the answer looks like this:
+            </p>
+            <pre class="cmu-snippet"><code>{
+  "url": "https://webkilt.andrew.cmu.edu/0/",
+  "title": "Carnegie Mellon Web Kilt",
+  "siteName": "Carnegie Mellon Web Kilt",
+  "image": { "url": "https://webkilt.andrew.cmu.edu/0/images/preview.jpg", "width": 1200, "height": 630 },
+  "findings": [
+    { "key": "title", "status": "pass", "text": "The title is \"Carnegie Mellon Web Kilt\"." },
+    &hellip;
+  ]
+}</code></pre>
+            <h2 id="fields" class="rule-top">Preview Fields</h2>
+            <table class="alternate cmu-full">
+              <thead
+                ><tr><th scope="col">Field</th><th scope="col">What It Does</th></tr></thead
+              >
+              <tbody>
+                <tr
+                  ><th scope="row"><code>url</code></th
+                  ><td>The page, on a site FencePost captures. Required.</td></tr
+                >
+                <tr
+                  ><th scope="row"><code>title</code></th
+                  ><td
+                    >Up to 100 characters. Blank uses the page's own title; required with a
+                    screenshot.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row"><code>description</code></th
+                  ><td>Up to 220 characters. Blank uses the page's own description.</td></tr
+                >
+                <tr
+                  ><th scope="row"><code>site</code></th
+                  ><td>The site's name, up to 60 characters.</td></tr
+                >
+                <tr
+                  ><th scope="row"><code>imagePath</code></th
+                  ><td
+                    >Where you'll save the image; the tags point to it. Default
+                    <code>/images/preview.jpg</code>.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row"><code>screenshot</code></th
+                  ><td
+                    >A base64 PNG, JPEG or WebP under 8 MB, used instead of a capture, for a page
+                    behind a sign-in.</td
+                  ></tr
+                >
+              </tbody>
+            </table>
+            <h2 id="mcp" class="rule-top">MCP Server</h2>
+            <p>Connect an AI agent to FencePost's MCP server with these settings:</p>
+            <table class="alternate cmu-full">
+              <thead
+                ><tr><th scope="col">Connection</th><th scope="col">Value</th></tr></thead
+              >
+              <tbody>
+                <tr
+                  ><th scope="row">Server Name</th><td><code>fencepost</code></td></tr
+                >
+                <tr
+                  ><th scope="row">Endpoint</th
+                  ><td><code>https://fencepost.andrew.cmu.edu/mcp</code></td></tr
+                >
+                <tr><th scope="row">Transport</th><td>Streamable HTTP, without sign-in</td></tr>
+              </tbody>
+            </table>
+            <p>It offers these tools:</p>
+            <table class="alternate cmu-full">
+              <thead
+                ><tr
+                  ><th scope="col">Tool</th><th scope="col">Input</th
+                  ><th scope="col">Result</th></tr
+                ></thead
+              >
+              <tbody>
+                <tr
+                  ><th scope="row"><code>get_guide</code></th
+                  ><td>No arguments</td
+                  ><td>The preview rules, the approved domains and the fields</td></tr
+                >
+                <tr
+                  ><th scope="row"><code>check_link</code></th
+                  ><td><code>url</code></td
+                  ><td>The same as <code>POST /api/check</code></td></tr
+                >
+                <tr
+                  ><th scope="row"><code>generate_preview</code></th
+                  ><td><code>url</code> and the <a href="#fields">preview fields</a></td
+                  ><td>The JPEG as an image, with the tags and where to save it</td></tr
+                >
+              </tbody>
+            </table>
+            <p>
+              Screenshots are only on the page and the API. A failure returns a tool result marked
+              <code>isError</code> with the same message the API gives.
+            </p>
+            <h2 id="wordpress" class="rule-top">WordPress Plugin</h2>
+            <p>
+              FencePost Link Previews, a WordPress plugin, makes each page's preview image for you.
+              About a minute after a page or post is published or updated, it sends the page's
+              address and the site's name to <code>POST /api/preview</code>, saves the image in the
+              media library and uses it for that page. A featured image always wins.
+            </p>
+            <ul class="cmu-checks">
+              <li>
+                <strong>It works with what the site already has:</strong> the Forbes &amp; Moreword
+                theme, Yoast SEO, Rank Math, All in One SEO and SEOPress. With none of them, it
+                writes the image tags itself.
+              </li>
+              <li>
+                <strong>Pages must be public</strong> and on cmu.edu or an
+                <a href="#sites">approved site</a>. When FencePost can't capture one, the
+                <strong>Link Preview</strong> column in Pages and Posts says why.
+              </li>
+              <li>
+                <strong>To make a new one now,</strong> select <strong>Make a New Preview</strong>
+                under the page's title in Pages or Posts.
+              </li>
+            </ul>
+            <p>
+              Download
+              <a
+                href="https://github.com/cmu-web/cmu-web-fencepost/releases/latest/download/fencepost-wordpress.zip"
+                >fencepost-wordpress.zip</a
+              >
+              and upload it in <strong>Plugins › Add New Plugin › Upload Plugin</strong>, or install
+              it with WP-CLI:
+            </p>
+            <pre
+              class="cmu-snippet"
+            ><code>wp plugin install https://github.com/cmu-web/cmu-web-fencepost/releases/latest/download/fencepost-wordpress.zip --activate</code></pre>
+            <h2 id="errors" class="rule-top">Errors</h2>
+            <table class="alternate cmu-full">
+              <thead
+                ><tr
+                  ><th scope="col">Status</th><th scope="col">Meaning</th
+                  ><th scope="col">What to Check</th></tr
+                ></thead
+              >
+              <tbody>
+                <tr
+                  ><th scope="row">400</th><td>FencePost can't use that request.</td
+                  ><td
+                    >The address (a full https:// address), the field lengths and the screenshot's
+                    type and size.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row">403</th><td>The site isn't one FencePost captures.</td
+                  ><td>See <a href="#sites">Approved Sites</a>.</td></tr
+                >
+                <tr
+                  ><th scope="row">429</th><td>Two captures are already running.</td
+                  ><td>Wait a moment and try again.</td></tr
+                >
+                <tr
+                  ><th scope="row">502</th><td>The page answered with an error.</td
+                  ><td
+                    >The page itself; a 401 or 403 from it means a sign-in, so upload a screenshot
+                    instead. A response with <code>"code": "bot-check"</code> is a Cloudflare bot
+                    check; see <a href="#cloudflare">Sites Behind Cloudflare</a>.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row">504</th><td>The site took too long to answer.</td
+                  ><td>Try again; if it keeps happening, upload a screenshot.</td></tr
+                >
+                <tr
+                  ><th scope="row">500</th><td>Something went wrong in FencePost.</td
+                  ><td
+                    >Try again; if it keeps happening,
+                    <a class="external" href="https://github.com/cmu-web/cmu-web-fencepost/issues"
+                      >report it on GitHub</a
+                    >
+                    with a made-up example.</td
+                  ></tr
+                >
+              </tbody>
+            </table>
+            <p>
+              Every error is JSON with an <code>error</code> message written for the person using
+              the page, so it can be shown as is.
+            </p>
+            <h2 id="cloudflare" class="rule-top">Sites Behind Cloudflare</h2>
+            <p>
+              Some sites use Cloudflare's bot protection, which answers anything that isn't a full
+              browser with a challenge page instead of the site. FencePost can't get past it, and
+              says so. Apps such as Slack and LinkedIn are usually let through as known bots, so the
+              site's real previews may be fine; FencePost just can't see them.
+            </p>
+            <p
+              >If you manage the site's Cloudflare settings, let FencePost through with a custom
+              rule:</p
+            >
+            <ol class="cmu-steps">
+              <li>
+                In the Cloudflare dashboard, open the site's domain, then go to
+                <strong>Security &rsaquo; WAF &rsaquo; Custom rules</strong> and create a rule.
+              </li>
+              <li>
+                Match FencePost by its address: <strong>IP Source Address</strong> equals
+                <code>128.2.24.46</code>. Its requests also say <code>FencePost/1.0</code> in their
+                user agent, but anyone can send that, so match the address.
+              </li>
+              <li>
+                Choose the action <strong>Skip</strong>, pick the bot protection the site uses, and
+                deploy the rule.
+              </li>
+            </ol>
+            <p>
+              Cloudflare's free Bot Fight Mode can't be skipped by a rule, according to
+              <a class="external" href="https://developers.cloudflare.com/waf/custom-rules/skip/"
+                >Cloudflare's documentation</a
+              >. A site that uses it would have to turn it off for FencePost to see its pages. Until
+              then, generate the preview from your own screenshot in
+              <a href="generate.html">Generate a Preview</a>.
             </p>
           </div>
         </div>
@@ -137,8 +555,9 @@
         <div>
           <nav id="nav"
             ><ul
-              ><li><a href="check.html">Check</a></li
-              ><li><a href="make.html">Make</a></li
+              ><li><a href="check.html">Check a Link</a></li
+              ><li><a href="generate.html">Generate a Preview</a></li
+              ><li><a href="screenshots.html">Take a Screenshot</a></li
               ><li class="active"><a href="reference.html" aria-current="page">Reference</a></li
               ><li><a href="about.html">About</a></li></ul
             ></nav
@@ -150,8 +569,8 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
     <script
-      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.7.0/js/cmu-app.js"
-      integrity="sha384-kPYaRNjRAHnEY27lj3wKX2UTLNzxejzJWxXQ9pxOoRSmE2u7/p+KpJDix8iJedFe"
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.8.9/js/cmu-app.js"
+      integrity="sha384-OUj0Xw1O/00sPRbiU9tY0EIto5q/A7Nn7ZxhbEwk2B/5lcnAbLldNxyL52FO+MSK"
       crossorigin="anonymous"
     ></script>
   </body>
