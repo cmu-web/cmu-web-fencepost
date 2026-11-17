@@ -63,3 +63,31 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # The WordPress plugin: PHP syntax on every run; for a version tag, its
+  # zip (fencepost/ inside fencepost-wordpress.zip, without the tests) on the
+  # tag's GitHub release, once the release exists
+  wordpress:
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check the PHP
+        run: for f in packages/wordpress/*.php packages/wordpress/tests/*.php; do php -l "$f"; done
+      - name: Zip the plugin
+        run: |
+          mkdir -p build/fencepost
+          cp packages/wordpress/fencepost.php packages/wordpress/uninstall.php packages/wordpress/readme.txt LICENSE build/fencepost/
+          (cd build && zip -r ../fencepost-wordpress.zip fencepost)
+      - name: Attach it to the release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for i in $(seq 1 60); do
+            gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 && break
+            sleep 30
+          done
+          gh release upload "$GITHUB_REF_NAME" fencepost-wordpress.zip --clobber
