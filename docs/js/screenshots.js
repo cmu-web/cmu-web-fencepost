@@ -108,6 +108,9 @@
   var asked = params.get("kind");
   if (asked === "phone" || asked === "card")
     document.querySelector('input[name="fp-kind"][value="' + asked + '"]').checked = true;
+  // ...&delay=5 picks the wait, when it's one of the choices
+  if (byId("fp-delay").querySelector('option[value="' + params.get("delay") + '"]'))
+    byId("fp-delay").value = params.get("delay");
   showPlaceholder();
   document.querySelectorAll('input[name="fp-kind"]').forEach(function (radio) {
     radio.addEventListener("change", showPlaceholder);
@@ -125,7 +128,11 @@
       var response = await fetch("api/screenshot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: byId("fp-url").value.trim(), kind: k }),
+        body: JSON.stringify({
+          url: byId("fp-url").value.trim(),
+          kind: k,
+          delay: Number(byId("fp-delay").value),
+        }),
       });
       var result = await response.json().catch(function () {
         return { error: "That screenshot didn't work. Try again." };
@@ -158,29 +165,20 @@
       preview.alt = "A screenshot of " + result.title + (k === "phone" ? " on a phone." : ".");
       showFormat();
       byId("fp-actions").hidden = false;
-      // Under a phone, the menu is as wide as the phone, with Download beside it
+      // Under a phone on a wide screen, the menu is as wide as the phone;
+      // on a phone screen, and under a card, it's full width. The phone is
+      // hidden while the spinner shows, so use its frame's width from the
+      // stylesheet rather than its measured one
       var actions = byId("fp-actions");
-      actions.style.maxWidth = "";
-      if (kind() === "phone") {
-        var row = byId("fp-download").parentElement;
-        // The phone is hidden while the spinner shows, so use its frame's
-        // width from the stylesheet rather than its measured one
-        actions.style.maxWidth =
-          "calc(" +
-          getComputedStyle(byId("fp-figure")).maxWidth +
-          " + " +
-          (parseFloat(getComputedStyle(row).columnGap) || 0) +
-          "px + " +
-          byId("fp-download").offsetWidth +
-          "px)";
-      }
+      actions.style.maxWidth =
+        kind() === "phone" && matchMedia("(min-width: 768px)").matches
+          ? getComputedStyle(byId("fp-figure")).maxWidth
+          : "";
       message("Your screenshot is ready to download.", "success");
       // The address says what was taken, so the result can be sent as a link
-      history.replaceState(
-        null,
-        "",
-        "?" + new URLSearchParams({ url: byId("fp-url").value.trim(), kind: k }).toString(),
-      );
+      var state = new URLSearchParams({ url: byId("fp-url").value.trim(), kind: k });
+      if (byId("fp-delay").value !== "0") state.set("delay", byId("fp-delay").value);
+      history.replaceState(null, "", "?" + state.toString());
     } catch (error) {
       showPlaceholder();
       if (error.status === 403) notCaptured();

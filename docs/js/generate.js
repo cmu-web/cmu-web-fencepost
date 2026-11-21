@@ -127,6 +127,8 @@
         site: byId("fp-site").value.trim(),
         imagePath: byId("fp-path").value.trim(),
       };
+      // Only a capture waits
+      if (byId("fp-source").value === "capture") payload.delay = Number(byId("fp-delay").value);
       if (!payload.site) throw new Error("Enter the site's name.");
       var source = byId("fp-source").value,
         file = source === "upload" && byId("fp-file").files[0];

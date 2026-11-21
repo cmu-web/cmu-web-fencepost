@@ -195,17 +195,18 @@
       });
       byId("fc-results").hidden = false;
       if (fixes.length) {
-        var counts = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+        var counts = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
         message(
-          (counts[fixes.length] || fixes.length) +
+          "This page has " +
+            (counts[fixes.length] || fixes.length) +
             (fixes.length === 1 ? " thing" : " things") +
-            " to fix.",
+            " to fix before you share it.",
         );
       } else
         message(
           notes.length
-            ? "Required checks passed. Review the notes below."
-            : "All required checks passed.",
+            ? "This link is ready to share. Review the notes below."
+            : "This link is ready to share.",
           "success",
         );
     } catch (error) {

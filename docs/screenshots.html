@@ -77,7 +77,7 @@
         </div>
         <div id="sitename">
           <span class="sitetitle"><a href="./">FencePost</a></span>
-          <h2>Good Previews Make Good Neighbors</h2>
+          <h2>Good previews make good neighbors</h2>
         </div>
       </header>
       <main id="content">
@@ -99,7 +99,7 @@
                   inputmode="url"
                   id="fp-url"
                   required
-                  placeholder="forbesandmoreword.andrew.cmu.edu"
+                  placeholder="themes.andrew.cmu.edu/forbes-and-moreword"
                   maxlength="2048"
                   aria-describedby="fp-url-hint"
                 />
@@ -127,6 +127,16 @@
                     </li>
                   </ul>
                 </fieldset>
+                <label for="fp-delay">Delay</label>
+                <select id="fp-delay" aria-describedby="fp-delay-hint">
+                  <option value="0" selected>None</option>
+                  <option value="2">2 Seconds</option>
+                  <option value="5">5 Seconds</option>
+                  <option value="10">10 Seconds</option>
+                </select>
+                <p class="cmu-hint" id="fp-delay-hint"
+                  >For pages that make an entrance: fade-ins, count-ups, late images.</p
+                >
                 <p><button class="btn" type="submit">Take the Screenshot</button></p>
               </form>
               <div>
@@ -145,15 +155,13 @@
                 </figure>
                 <div id="fp-actions" hidden>
                   <label for="fp-format">File Type</label>
-                  <div class="cmu-field-button">
-                    <select id="fp-format" aria-describedby="fp-format-hint">
-                      <option value="webp">WebP</option>
-                      <option value="png">PNG</option>
-                      <option value="jpeg">JPEG</option>
-                    </select>
-                    <a class="btn" id="fp-download" download>Download</a>
-                  </div>
+                  <select id="fp-format" aria-describedby="fp-format-hint">
+                    <option value="webp">WebP</option>
+                    <option value="png">PNG</option>
+                    <option value="jpeg">JPEG</option>
+                  </select>
                   <p class="cmu-hint" id="fp-format-hint"></p>
+                  <p><a class="btn" id="fp-download" download>Download Screenshot</a></p>
                 </div>
               </div>
             </div>

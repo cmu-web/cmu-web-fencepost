@@ -77,7 +77,7 @@
         </div>
         <div id="sitename">
           <span class="sitetitle"><a href="./">FencePost</a></span>
-          <h2>Good Previews Make Good Neighbors</h2>
+          <h2>Good previews make good neighbors</h2>
         </div>
       </header>
       <main id="content">
@@ -99,7 +99,7 @@
                   inputmode="url"
                   id="fp-url"
                   required
-                  placeholder="forbesandmoreword.andrew.cmu.edu/news/"
+                  placeholder="themes.andrew.cmu.edu/forbes-and-moreword/0/news/"
                   maxlength="2048"
                   aria-describedby="fp-url-hint"
                 />
@@ -161,7 +161,7 @@
                     inputmode="url"
                     id="fp-image-url"
                     maxlength="2048"
-                    placeholder="forbesandmoreword.andrew.cmu.edu/images/preview.jpg"
+                    placeholder="themes.andrew.cmu.edu/forbes-and-moreword/0/images/preview.jpg"
                     aria-describedby="fp-image-url-hint"
                   />
                   <p class="cmu-hint" id="fp-image-url-hint">
@@ -191,6 +191,18 @@
                     ><button class="btn ghost" type="button" id="fp-clear-file" hidden
                       >Clear the Screenshot</button
                     ></p
+                  >
+                </div>
+                <div data-cmu-option="capture">
+                  <label for="fp-delay">Delay</label>
+                  <select id="fp-delay" aria-describedby="fp-delay-hint">
+                    <option value="0" selected>None</option>
+                    <option value="2">2 Seconds</option>
+                    <option value="5">5 Seconds</option>
+                    <option value="10">10 Seconds</option>
+                  </select>
+                  <p class="cmu-hint" id="fp-delay-hint"
+                    >For pages that make an entrance: fade-ins, count-ups, late images.</p
                   >
                 </div>
                 <div id="fp-path-box" data-cmu-option="capture upload">
