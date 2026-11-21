@@ -1,6 +1,6 @@
 {
   "name": "cmu-web-fencepost",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "private": true,
   "description": "Link previews for Carnegie Mellon websites: the image and the Open Graph tags.",
   "scripts": {
