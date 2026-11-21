@@ -74,7 +74,7 @@ runs:
       env:
         # FencePost's release container image, the same version as this action;
         # npm run check:action keeps it matched to package.json
-        RELEASE_IMAGE: ghcr.io/cmu-web/cmu-web-fencepost:0.2.1
+        RELEASE_IMAGE: ghcr.io/cmu-web/cmu-web-fencepost:0.2.2
         FP_CONTAINER_IMAGE: ${{ inputs.container-image }}
         FP_URL: ${{ inputs.url }}
         FP_PREVIEW: ${{ inputs.preview }}

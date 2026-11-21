@@ -3,7 +3,7 @@
  * Plugin Name:       FencePost Link Previews
  * Plugin URI:        https://fencepost.andrew.cmu.edu/reference.html#wordpress
  * Description:       Makes each page's link preview image with FencePost when it's published or updated.
- * Version:           0.2.1
+ * Version:           0.2.2
  * Requires at least: 6.6
  * Requires PHP:      8.1
  * Author:            Carnegie Mellon University
