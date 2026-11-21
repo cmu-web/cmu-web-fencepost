@@ -1,0 +1,57 @@
+name: Test Action
+
+# FencePost's action on FencePost itself: builds the container image from the
+# commit, serves docs/ inside the job and captures it with the action, as a
+# site's workflow would before publishing
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build the container image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          target: production
+          load: true
+          tags: fencepost:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Serve the docs
+        run: |
+          python3 -m http.server 4000 --bind 127.0.0.1 --directory docs >/dev/null 2>&1 &
+          until curl -fs http://127.0.0.1:4000/ >/dev/null; do sleep 1; done
+      - id: fencepost
+        uses: ./
+        with:
+          url: http://127.0.0.1:4000/
+          preview: shots/preview.jpg
+          card: shots/card.webp
+          phone: shots/phone.webp
+          public-url: https://fencepost.andrew.cmu.edu/
+          site: FencePost
+          container-image: fencepost:${{ github.sha }}
+      - name: Check the preview image
+        env:
+          TITLE: ${{ steps.fencepost.outputs.title }}
+          TAGS: ${{ steps.fencepost.outputs.tags }}
+        run: |
+          file shots/preview.jpg | grep 'JPEG image data.*1200x630'
+          test "$(stat -c %s shots/preview.jpg)" -le 300000
+          test -s shots/card.webp && test -s shots/phone.webp
+          test -n "$TITLE"
+          grep -q 'og:image" content="https://fencepost.andrew.cmu.edu/images/preview.jpg"' <<<"$TAGS"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fencepost-shots
+          path: shots/
