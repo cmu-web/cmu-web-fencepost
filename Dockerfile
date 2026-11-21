@@ -20,6 +20,9 @@ CMD ["sleep", "infinity"]
 # Runs every check (npm run check) with the image's own Node and npm; CI
 # builds this stage
 FROM dependencies AS test
+# Chromium too: the capture tests run a real browser, as the service does
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright
+RUN npx playwright install --with-deps chromium
 COPY . .
 RUN npm run check
 
