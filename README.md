@@ -89,7 +89,7 @@ serves it inside the job, and the action captures it there.
   run: |
     python3 -m http.server 4000 --bind 127.0.0.1 --directory _site &
     until curl -fs http://127.0.0.1:4000/ >/dev/null; do sleep 1; done
-- uses: cmu-web/cmu-web-fencepost@0.2.0
+- uses: cmu-web/cmu-web-fencepost@0.2.1
   with:
     url: http://127.0.0.1:4000/
     preview: _site/images/preview.jpg
@@ -103,7 +103,7 @@ runner has to mount the Docker socket (`docker_host: automount` under
 Docker command line.
 
 ```yaml
-- uses: https://github.com/cmu-web/cmu-web-fencepost@0.2.0
+- uses: https://github.com/cmu-web/cmu-web-fencepost@0.2.1
   with:
     url: http://127.0.0.1:4000/
     preview: _site/images/preview.jpg
