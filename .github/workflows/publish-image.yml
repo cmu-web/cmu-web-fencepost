@@ -1,4 +1,9 @@
-name: Check and publish
+# Runs every check in the Dockerfile's test stage, then builds the service's
+# image and the WordPress plugin's zip. Pushes the image to
+# ghcr.io/cmu-web/cmu-web-fencepost only for releases (version tags or a
+# manual run), where a deployment pins it by digest, and attaches the zip to the
+# tag's GitHub release.
+name: Publish Image
 
 on:
   push:
@@ -15,6 +20,7 @@ jobs:
   # Node and npm
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
@@ -31,6 +37,7 @@ jobs:
   image:
     needs: check
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       RELEASE: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
     permissions:
@@ -70,6 +77,7 @@ jobs:
   wordpress:
     needs: check
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     permissions:
       contents: write
     steps:
@@ -81,10 +89,12 @@ jobs:
           mkdir -p build/fencepost
           cp packages/wordpress/fencepost.php packages/wordpress/uninstall.php packages/wordpress/readme.txt LICENSE build/fencepost/
           (cd build && zip -r ../fencepost-wordpress.zip fencepost)
-      - name: Attach it to the release
+      # A person makes the release, with its notes; this waits for it (up to
+      # 30 minutes) and attaches the zip
+      - name: Attach to the release
         if: startsWith(github.ref, 'refs/tags/')
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           for i in $(seq 1 60); do
             gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 && break
