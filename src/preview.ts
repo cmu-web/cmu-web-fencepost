@@ -1,6 +1,13 @@
 import sharp from "sharp";
 import { card, openGraph } from "./card";
-import { capturePage, publicFetch, publicUrl, withScheme, type Capture } from "./capture";
+import {
+  capturePage,
+  checkDelay,
+  publicFetch,
+  publicUrl,
+  withScheme,
+  type Capture,
+} from "./capture";
 import { readTags } from "./check";
 import { allowedHost, type Domain } from "./domains";
 import { GenerateError } from "./shared";
@@ -16,6 +23,9 @@ export interface PreviewRequest {
   // A link to an image that already exists, on the same sites as pages; the
   // page's own title and description are still read from its link
   imageUrl?: string;
+  // Seconds to wait after the page loads before capturing it (0 to 10); only
+  // a capture waits
+  delay?: number;
 }
 
 export interface Preview {
@@ -50,6 +60,8 @@ export type Capturer = (
   allow: (host: string) => boolean,
   size?: { width: number; height: number },
   scale?: number,
+  /** Seconds to wait after the page loads (0 to 10) */
+  delay?: number,
 ) => Promise<Capture>;
 
 export const LIMITS = { title: 100, description: 220, site: 60, screenshotBytes: 8 * 1024 * 1024 };
@@ -62,6 +74,7 @@ export async function makePreview(
   capture: Capturer = capturePage,
 ): Promise<Preview> {
   const url = publicUrl(req.url).href;
+  const delay = checkDelay(req.delay);
   const site = (req.site || "").slice(0, LIMITS.site);
   const imagePath = req.imagePath || "/images/preview.jpg";
   let source: Capture;
@@ -114,7 +127,7 @@ export async function makePreview(
       };
     imageFixesFound = fixes;
   } else {
-    source = await capture(url, (host) => allowedHost(host, domains));
+    source = await capture(url, (host) => allowedHost(host, domains), undefined, undefined, delay);
   }
   const title = (req.title?.trim() || source.title).slice(0, LIMITS.title);
   const description = (req.description?.trim() || source.description).slice(0, LIMITS.description);

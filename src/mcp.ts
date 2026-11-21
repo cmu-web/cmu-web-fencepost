@@ -7,6 +7,7 @@ import { join } from "node:path";
 import * as z from "zod";
 import { checkLink, type Fetcher } from "./check";
 import { allowedHost, type Domain } from "./domains";
+import { DELAY_MAX } from "./capture";
 import { LIMITS, makePreview, type Capturer } from "./preview";
 import { GenerateError } from "./shared";
 
@@ -38,7 +39,7 @@ export function createMcp(
       content: [
         {
           type: "text",
-          text: `check_link takes url and reports what a share would show and what to fix. generate_preview takes url (a public page on cmu.edu or an approved Carnegie Mellon domain), and optionally title (up to ${LIMITS.title} characters), description (up to ${LIMITS.description}), site (the site's name, up to ${LIMITS.site}), imagePath (where the site will host the image, default /images/preview.jpg), screenshot (base64 PNG, JPEG or WebP under 8 MB, to skip the capture) and imageUrl (a link to an existing image on the same sites, used instead of a capture: if it's already 1200 × 630, a JPEG and under 300 KB, the tags point to it and there's nothing to save; otherwise it's cropped to a new JPEG to save, and imageFixes says why). It returns the JPEG and the tags; nothing is stored. Pages are captured signed out, so a page behind a sign-in fails; upload a screenshot instead. Approved domains: ${domains.map((d) => d.domain).join(", ") || "none yet"}. To add one, use the Request a Domain form in the GitHub repository. Full reference: ${base}/reference.html.`,
+          text: `check_link takes url and reports what a share would show and what to fix. generate_preview takes url (a public page on cmu.edu or an approved Carnegie Mellon domain), and optionally title (up to ${LIMITS.title} characters), description (up to ${LIMITS.description}), site (the site's name, up to ${LIMITS.site}), imagePath (where the site will host the image, default /images/preview.jpg), screenshot (base64 PNG, JPEG or WebP under 8 MB, to skip the capture) and imageUrl (a link to an existing image on the same sites, used instead of a capture: if it's already 1200 × 630, a JPEG and under 300 KB, the tags point to it and there's nothing to save; otherwise it's cropped to a new JPEG to save, and imageFixes says why) and delay (seconds to wait after the page loads before capturing it, 0 to ${DELAY_MAX}, for numbers that count up or images that load late). It returns the JPEG and the tags; nothing is stored. Pages are captured signed out, so a page behind a sign-in fails; upload a screenshot instead. Approved domains: ${domains.map((d) => d.domain).join(", ") || "none yet"}. To add one, use the Request a Domain form in the GitHub repository. Full reference: ${base}/reference.html.`,
         },
       ],
     }),
@@ -88,6 +89,15 @@ export function createMcp(
         imagePath: z.string().max(2048).optional(),
         screenshot: z.string().max(11_200_000).optional(),
         imageUrl: z.string().max(2048).optional(),
+        delay: z
+          .number()
+          .int()
+          .min(0)
+          .max(DELAY_MAX)
+          .optional()
+          .describe(
+            "Seconds to wait after the page loads before capturing it, for numbers that count up or images that load late. 0 to 10; default 0.",
+          ),
       },
       annotations: { readOnlyHint: true, openWorldHint: true },
     },

@@ -3,7 +3,7 @@
 // frame. The same capture and site rules as a link preview. Used by the
 // Screenshots page (/api/screenshot) and npm run gallery.
 import sharp from "sharp";
-import { capturePage, GALLERY_SIZE, PHONE_SIZE, publicUrl } from "./capture";
+import { capturePage, checkDelay, GALLERY_SIZE, PHONE_SIZE, publicUrl } from "./capture";
 import { allowedHost, type Domain } from "./domains";
 import type { Capturer } from "./preview";
 import { GenerateError } from "./shared";
@@ -64,14 +64,18 @@ export async function makeScreenshot(
   kind: string,
   domains: Domain[],
   capture: Capturer = capturePage,
+  /** Seconds to wait after the page loads (0 to 10) */
+  delay = 0,
 ): Promise<Screenshot> {
   if (!(kind in KINDS)) throw new GenerateError("Choose a card or a phone.");
+  const wait = checkDelay(delay);
   const { size, scale, name } = KINDS[kind as Kind];
   const shot = await capture(
     publicUrl(url).href,
     (host) => allowedHost(host, domains),
     size,
     scale,
+    wait,
   );
   // Exactly the size asked for, from the top, whatever the capture returned
   let image: Buffer = await sharp(shot.image)

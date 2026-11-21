@@ -5,7 +5,7 @@ import { allowedHost, loadDomains, type Domain } from "./domains";
 import { mountMcp } from "./mcp";
 import { makePreview, type Capturer } from "./preview";
 import { makeScreenshot } from "./screenshot";
-import { withScheme } from "./capture";
+import { checkDelay, withScheme } from "./capture";
 import { GenerateError } from "./shared";
 
 export function createApp(
@@ -34,6 +34,7 @@ export function createApp(
           imagePath: str("imagePath"),
           screenshot: str("screenshot"),
           imageUrl: str("imageUrl"),
+          delay: checkDelay(body.delay),
         },
         domains,
         capture,
@@ -69,6 +70,7 @@ export function createApp(
         typeof body.kind === "string" ? body.kind : "card",
         domains,
         capture,
+        checkDelay(body.delay),
       );
       res.set("Cache-Control", "no-store").json({
         width: shot.width,

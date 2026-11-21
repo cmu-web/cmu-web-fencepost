@@ -1,15 +1,30 @@
+import { mkdtemp, readFile } from "node:fs/promises";
+import { readdirSync, readFileSync } from "node:fs";
+import http from "node:http";
+import type { AddressInfo } from "node:net";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import sharp from "sharp";
 import request from "supertest";
 import { inkFor, STATUS_BAR, topColor, withStatusBar } from "../src/statusbar";
 import { describe, expect, it } from "vitest";
 import { createApp } from "../src/app";
 import { card, openGraph } from "../src/card";
-import { publicAddress, publicFetch, publicUrl, tracker, withScheme } from "../src/capture";
+import {
+  capturePage,
+  checkDelay,
+  publicAddress,
+  publicFetch,
+  publicUrl,
+  tracker,
+  withScheme,
+} from "../src/capture";
 import { checkLink, STANDARD, readTags, type Fetcher } from "../src/check";
+import { githubOutputs, shoot } from "../src/cli";
 import { allowedHost, type Domain } from "../src/domains";
-import { imageFixes, type Capturer } from "../src/preview";
+import { imageFixes, makePreview, type Capturer } from "../src/preview";
 import { GenerateError } from "../src/shared";
-import { fileStem } from "../src/screenshot";
+import { fileStem, makeScreenshot } from "../src/screenshot";
 
 const abtech: Domain = {
   domain: "abtech.org",
@@ -407,4 +422,237 @@ describe("phone status bar", () => {
     expect([meta.width, meta.height]).toEqual([780, 400 + STATUS_BAR * 2]);
     expect(await topColor(out)).toEqual([196, 18, 48]);
   });
+});
+
+// A site served on this machine, as a build serves one before it's published
+async function localSite(): Promise<{ url: string; close: () => Promise<void> }> {
+  const server = http.createServer((_req, res) => {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end("<title>Margaret Morrison's Page</title>");
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const { port } = server.address() as AddressInfo;
+  return {
+    url: `http://127.0.0.1:${port}/`,
+    close: () => new Promise((resolve) => server.close(() => resolve())),
+  };
+}
+
+describe("local sites, for the command line and the GitHub Action", () => {
+  it("fetches 127.0.0.1 only when asked for local reach", async () => {
+    const site = await localSite();
+    try {
+      await expect(publicFetch(site.url)).rejects.toThrow(/public website address/);
+      const page = await publicFetch(site.url, undefined, 0, undefined, "local");
+      expect(page.body.toString()).toContain("Margaret Morrison");
+    } finally {
+      await site.close();
+    }
+  });
+
+  it("never lets the web service reach 127.0.0.1, even on its list", async () => {
+    const site = await localSite();
+    const listed: Domain = { ...abtech, domain: "127.0.0.1" };
+    // The real capture and checker, not the stand-ins
+    const app = createApp([listed]);
+    try {
+      for (const path of ["/api/preview", "/api/screenshot", "/api/check"]) {
+        const res = await request(app).post(path).send({ url: site.url });
+        expect(res.status, path).toBe(400);
+        expect(res.body.error, path).toMatch(/public website address/);
+      }
+    } finally {
+      await site.close();
+    }
+  });
+
+  it("asks for local reach only in cli.ts", () => {
+    const dir = join(__dirname, "..", "src");
+    for (const file of readdirSync(dir)) {
+      const source = readFileSync(join(dir, file), "utf8");
+      if (!["capture.ts", "cli.ts"].includes(file)) expect(source, file).not.toMatch(/"local"/);
+      if (file !== "cli.ts") expect(source, file).not.toMatch(/from "\.\/cli"/);
+    }
+  });
+
+  it("writes the preview image to the standard, and the tags for the published address", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "fencepost-"));
+    const result = await shoot(
+      {
+        address: "http://127.0.0.1:4000/",
+        preview: join(dir, "images", "preview.jpg"),
+        card: join(dir, "card.webp"),
+        publicUrl: "https://www.cmu.edu/example/",
+        site: "Example",
+      },
+      fakeCapture,
+    );
+    const image = await readFile(join(dir, "images", "preview.jpg"));
+    const meta = await sharp(image).metadata();
+    expect([meta.format, meta.width, meta.height]).toEqual(["jpeg", 1200, 630]);
+    expect(image.length).toBeLessThanOrEqual(300_000);
+    expect((await sharp(await readFile(join(dir, "card.webp"))).metadata()).format).toBe("webp");
+    expect(result.title).toBe("Andrew Carnegie's Page");
+    expect(result.tags).toContain('content="https://www.cmu.edu/images/preview.jpg"');
+    await expect(
+      shoot({ address: "http://127.0.0.1:4000/", preview: join(dir, "p.png") }, fakeCapture),
+    ).rejects.toThrow(/\.jpg/);
+  });
+
+  it("writes the action's outputs in GITHUB_OUTPUT's format", () => {
+    const out = githubOutputs(
+      {
+        title: "Andrew Carnegie's Page",
+        description: "Two\nlines",
+        preview: "images/preview.jpg",
+        tags: '<meta property="og:title" content="A" />\n<meta name="twitter:card" />',
+      },
+      "END",
+    );
+    expect(out).toBe(
+      "title=Andrew Carnegie's Page\ndescription=Two lines\npreview=images/preview.jpg\ncard=\nphone=\n" +
+        'tags<<END\n<meta property="og:title" content="A" />\n<meta name="twitter:card" />\nEND\n',
+    );
+  });
+});
+
+// A made-up page that turns from white to CMU red a second after it loads, like
+// a page with a loading animation or delayed images
+async function slowSite(): Promise<{ url: string; close: () => Promise<void> }> {
+  const server = http.createServer((_req, res) => {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end(
+      "<title>Andrew Mellon's Page</title><body style='margin:0;background:#fff'>" +
+        "<script>setTimeout(function(){document.body.style.background='#c41230'},1000)</script>",
+    );
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const { port } = server.address() as AddressInfo;
+  return {
+    url: `http://127.0.0.1:${port}/`,
+    close: () => new Promise((resolve) => server.close(() => resolve())),
+  };
+}
+
+describe("waiting before a capture", () => {
+  it("takes whole seconds from 0 to 10, and nothing else", () => {
+    for (const [given, seconds] of [
+      [undefined, 0],
+      ["", 0],
+      [0, 0],
+      [10, 10],
+      ["3", 3],
+    ] as const)
+      expect(checkDelay(given)).toBe(seconds);
+    for (const bad of [-1, 11, 2.5, "abc", "2.5", "-1", NaN, true])
+      expect(() => checkDelay(bad), String(bad)).toThrow(
+        "Choose a wait of 0 to 10 seconds, in whole seconds.",
+      );
+  });
+
+  // A stand-in that records the wait it was asked for
+  const waits: (number | undefined)[] = [];
+  const recording: Capturer = async (url, allow, size, scale, delay) => {
+    waits.push(delay);
+    return fakeCapture(url, allow, size, scale);
+  };
+
+  it("passes the wait through the API, and refuses a bad one before capturing", async () => {
+    const app = createApp([abtech], recording);
+    waits.length = 0;
+    await request(app)
+      .post("/api/preview")
+      .send({ url: "https://www.cmu.edu/example/", site: "Example", delay: 3 })
+      .expect(200);
+    await request(app)
+      .post("/api/screenshot")
+      .send({ url: "https://www.cmu.edu/example/", kind: "card", delay: 2 })
+      .expect(200);
+    await request(app)
+      .post("/api/screenshot")
+      .send({ url: "https://www.cmu.edu/example/", kind: "card" })
+      .expect(200);
+    expect(waits).toEqual([3, 2, 0]);
+    for (const path of ["/api/preview", "/api/screenshot"]) {
+      const res = await request(app)
+        .post(path)
+        .send({ url: "https://www.cmu.edu/example/", site: "Example", delay: 11 });
+      expect(res.status, path).toBe(400);
+      expect(res.body.error, path).toMatch(/0 to 10 seconds/);
+    }
+    expect(waits).toHaveLength(3);
+  });
+
+  it("doesn't wait for an uploaded screenshot", async () => {
+    waits.length = 0;
+    await makePreview(
+      {
+        url: "https://www.cmu.edu/example/",
+        title: "Margaret Morrison's Page",
+        screenshot: (await screenshot()).toString("base64"),
+        delay: 5,
+      },
+      [],
+      recording,
+    );
+    expect(waits).toEqual([]);
+  });
+
+  it("passes the wait from the command line to every capture", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "fencepost-"));
+    waits.length = 0;
+    await shoot(
+      {
+        address: "http://127.0.0.1:4000/",
+        preview: join(dir, "preview.jpg"),
+        card: join(dir, "card.webp"),
+        phone: join(dir, "phone.webp"),
+        delay: 4,
+      },
+      recording,
+    );
+    expect(waits).toEqual([4, 4, 4]);
+    await expect(
+      shoot({ address: "http://127.0.0.1:4000/", delay: 12 }, recording),
+    ).rejects.toThrow(/0 to 10 seconds/);
+  });
+
+  it("hands the Action's delay input to the command line", () => {
+    const action = readFileSync(join(__dirname, "..", "action.yml"), "utf8");
+    expect(action).toMatch(/^ {2}delay:\n/m);
+    expect(action).toContain("FP_DELAY: ${{ inputs.delay }}");
+    expect(action).toContain('--delay "$FP_DELAY"');
+  });
+
+  it("really waits, so content that appears late is in the shot", async () => {
+    const site = await slowSite();
+    const size = { width: 200, height: 120 };
+    // The page's top-left pixel: white before the change, red after
+    const corner = async (image: Buffer) =>
+      Array.from(
+        (
+          await sharp(image).extract({ left: 0, top: 0, width: 1, height: 1 }).raw().toBuffer()
+        ).subarray(0, 3),
+      );
+    try {
+      const now = await capturePage(site.url, () => true, size, 1, 0, "local");
+      expect(await corner(now.image)).toEqual([255, 255, 255]);
+      const started = Date.now();
+      const later = await capturePage(site.url, () => true, size, 1, 2, "local");
+      expect(Date.now() - started).toBeGreaterThanOrEqual(2000);
+      expect(await corner(later.image)).toEqual([196, 18, 48]);
+      // The same wait through makeScreenshot, which the Screenshots page uses
+      const shot = await makeScreenshot(
+        site.url,
+        "card",
+        [],
+        (url, _allow, s, scale, delay) => capturePage(url, () => true, s, scale, delay, "local"),
+        2,
+      );
+      const png = shot.images.find((f) => f.format === "png")!.image;
+      expect(await corner(png)).toEqual([196, 18, 48]);
+    } finally {
+      await site.close();
+    }
+  }, 60_000);
 });

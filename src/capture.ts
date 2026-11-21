@@ -1,4 +1,4 @@
-import { Resolver } from "node:dns/promises";
+import { lookup, Resolver } from "node:dns/promises";
 import http, { STATUS_CODES } from "node:http";
 import https from "node:https";
 import ipaddr from "ipaddr.js";
@@ -94,6 +94,26 @@ async function lookUp(h: string): Promise<Resolved> {
     : { address: found(v6)[0], family: 6 };
 }
 
+/** Where a fetch may go: "public" (the default, and all the web service and
+ *  the MCP server ever use) is the public internet only. "local" also reaches
+ *  private and loopback addresses, through the machine's own DNS; only the
+ *  command line (cli.ts, which the GitHub Action runs) asks for it, to capture
+ *  a site served inside a build before it's published. */
+export type Reach = "public" | "local";
+
+// The machine's own lookup, with no range check: 127.0.0.1, localhost and
+// names only the build's network knows
+async function resolveLocal(host: string): Promise<Resolved> {
+  const h = host.replace(/^\[|\]$/g, "").toLowerCase();
+  if (ipaddr.isValid(h)) return { address: h, family: ipaddr.parse(h).kind() === "ipv6" ? 6 : 4 };
+  try {
+    const found = await lookup(h);
+    return { address: found.address, family: found.family === 6 ? 6 : 4 };
+  } catch {
+    throw new GenerateError("FencePost couldn't look up that address.");
+  }
+}
+
 export async function resolvePublic(host: string): Promise<Resolved> {
   const h = host.replace(/^\[|\]$/g, "").toLowerCase();
   if (ipaddr.isValid(h)) {
@@ -125,6 +145,7 @@ export async function publicFetch(
   // The page asking for it, passed on as the browser would: some embeds, such
   // as YouTube's player, refuse to play without it
   referer?: string,
+  reach: Reach = "public",
 ): Promise<Fetched> {
   const url = publicUrl(input);
   if (allow && !allow(url.hostname))
@@ -132,7 +153,8 @@ export async function publicFetch(
       "FencePost works only with Carnegie Mellon sites. To add yours, use the Request a Domain form on the Reference page.",
       403,
     );
-  const address = await resolvePublic(url.hostname);
+  const address =
+    reach === "local" ? await resolveLocal(url.hostname) : await resolvePublic(url.hostname);
   const result = await new Promise<{
     body: Buffer;
     type: string;
@@ -189,7 +211,7 @@ export async function publicFetch(
   });
   if (result.status >= 300 && result.status < 400 && result.location) {
     if (redirects >= 5) throw new GenerateError("The site redirects too many times.");
-    return publicFetch(new URL(result.location, url).href, allow, redirects + 1, referer);
+    return publicFetch(new URL(result.location, url).href, allow, redirects + 1, referer, reach);
   }
   // Cloudflare's bot check answers a non-browser with a challenge page, not
   // the site: say so, rather than blame a sign-in
@@ -247,6 +269,25 @@ export const GALLERY_SIZE = { width: 1040, height: 656 };
  *  with nothing cut */
 export const PHONE_SIZE = { width: 430, height: 738 };
 
+/** The most a capture waits after the page loads, in seconds */
+export const DELAY_MAX = 10;
+
+/** A wait before the screenshot, in whole seconds from 0 to DELAY_MAX, from a
+ *  number or a string of digits (a form, a command-line flag or an Action
+ *  input). Missing or blank is 0. Anything else is a GenerateError (400). */
+export function checkDelay(value: unknown): number {
+  if (value === undefined || value === null || value === "") return 0;
+  const seconds =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && /^\s*\d+\s*$/.test(value)
+        ? Number(value)
+        : NaN;
+  if (!Number.isInteger(seconds) || seconds < 0 || seconds > DELAY_MAX)
+    throw new GenerateError(`Choose a wait of 0 to ${DELAY_MAX} seconds, in whole seconds.`);
+  return seconds;
+}
+
 // Screenshots the top of a public page, signed out, at a link preview's size
 // unless given another. The browser has no network of its own: every request
 // goes through publicFetch.
@@ -256,13 +297,18 @@ export async function capturePage(
   size: { width: number; height: number } = PREVIEW_SIZE,
   /** Device pixels per CSS pixel: 2 for a phone's sharper screen */
   scale = 1,
+  /** Seconds to wait after the page loads, for content that animates in or
+   *  loads late, such as numbers that count up or lazy images */
+  delay = 0,
+  reach: Reach = "public",
 ): Promise<Capture> {
   publicUrl(input);
+  const wait = checkDelay(delay);
   if (active >= 2)
     throw new GenerateError("Two captures are already in progress. Try again shortly.", 429);
   active++;
   try {
-    const page0 = await publicFetch(input, allow);
+    const page0 = await publicFetch(input, allow, 0, undefined, reach);
     const browser = await chromium.launch({
       proxy: { server: "http://127.0.0.1:9" },
       args: ["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"],
@@ -293,9 +339,9 @@ export async function capturePage(
           const resource =
             url === page0.url
               ? page0
-              : await publicFetch(url, undefined, 0, referer).catch((e: unknown) => {
+              : await publicFetch(url, undefined, 0, referer, reach).catch((e: unknown) => {
                   if (e instanceof GenerateError) throw e;
-                  return publicFetch(url, undefined, 0, referer);
+                  return publicFetch(url, undefined, 0, referer, reach);
                 });
           await route.fulfill({ status: 200, contentType: resource.type, body: resource.body });
         } catch (e) {
@@ -304,7 +350,9 @@ export async function capturePage(
         }
       });
       const page = await context.newPage();
-      const deadline = setTimeout(() => void context.close(), 20000);
+      // The wait extends the capture's time limit rather than eating into it,
+      // so a slow page still has its full 20 seconds; the most is 30
+      const deadline = setTimeout(() => void context.close(), 20000 + wait * 1000);
       try {
         await page.goto(page0.url, { waitUntil: "load", timeout: 15000 });
         await page.evaluate(() => document.fonts.ready);
@@ -318,6 +366,7 @@ export async function capturePage(
             .catch(() => undefined);
           await page.waitForTimeout(500);
         }
+        if (wait) await page.waitForTimeout(wait * 1000);
         const title = (await page.title()).slice(0, 100);
         const description = (
           await page
