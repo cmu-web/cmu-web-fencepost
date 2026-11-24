@@ -3,6 +3,7 @@ import http, { STATUS_CODES } from "node:http";
 import https from "node:https";
 import ipaddr from "ipaddr.js";
 import { chromium } from "playwright";
+import { BOT_NAME, checkRobots, robotsRules } from "./robots";
 import { GenerateError } from "./shared";
 
 // Public resolvers, not the server's own: names that exist only in CMU's
@@ -10,7 +11,7 @@ import { GenerateError } from "./shared";
 const resolver = new Resolver({ timeout: 5000, tries: 2 });
 resolver.setServers((process.env.DNS_SERVERS || "1.1.1.1,8.8.8.8").split(","));
 
-const USER_AGENT = "FencePost/1.0 (link preview; https://fencepost.andrew.cmu.edu/)";
+const USER_AGENT = `${BOT_NAME}/1.0 (link preview; https://fencepost.andrew.cmu.edu/)`;
 
 /** An address as typed: www.cmu.edu/example/ and www.cmu.edu:8443/ get
  *  https:// in front; only a scheme followed by // counts as one */
@@ -135,27 +136,12 @@ export interface Fetched {
   url: string;
 }
 
-// Fetches over the address it checked, so a second lookup can't switch to a
-// private one. allow, when given, has to pass for the address and for each
-// redirect.
-export async function publicFetch(
-  input: string,
-  allow?: (host: string) => boolean,
-  redirects = 0,
-  // The page asking for it, passed on as the browser would: some embeds, such
-  // as YouTube's player, refuse to play without it
-  referer?: string,
-  reach: Reach = "public",
-): Promise<Fetched> {
-  const url = publicUrl(input);
-  if (allow && !allow(url.hostname))
-    throw new GenerateError(
-      "FencePost works only with Carnegie Mellon sites. To add yours, use the Request a Domain form on the Reference page.",
-      403,
-    );
-  const address =
-    reach === "local" ? await resolveLocal(url.hostname) : await resolvePublic(url.hostname);
-  const result = await new Promise<{
+function resolveHost(url: URL, reach: Reach) {
+  return reach === "local" ? resolveLocal(url.hostname) : resolvePublic(url.hostname);
+}
+
+function requestUrl(url: URL, address: Resolved, referer?: string) {
+  return new Promise<{
     body: Buffer;
     type: string;
     location?: string;
@@ -209,10 +195,9 @@ export async function publicFetch(
       reject(e instanceof GenerateError ? e : new GenerateError(networkMessage(e), 502)),
     );
   });
-  if (result.status >= 300 && result.status < 400 && result.location) {
-    if (redirects >= 5) throw new GenerateError("The site redirects too many times.");
-    return publicFetch(new URL(result.location, url).href, allow, redirects + 1, referer, reach);
-  }
+}
+
+function checkChallenge(result: Awaited<ReturnType<typeof requestUrl>>): void {
   // Cloudflare's bot check answers a non-browser with a challenge page, not
   // the site: say so, rather than blame a sign-in
   if (
@@ -226,6 +211,89 @@ export async function publicFetch(
       502,
       "bot-check",
     );
+}
+
+type Rules = ReturnType<typeof robotsRules>;
+const policies = new Map<string, { expires: number; result: Promise<Rules> }>();
+
+// Follows robots.txt redirects to any public host: the rules are text, and a
+// site often sends them to its www. host
+async function loadRules(origin: string, reach: Reach): Promise<Rules> {
+  let url = new URL("/robots.txt", origin);
+  for (let hop = 0; hop <= 5; hop++) {
+    const response = await requestUrl(url, await resolveHost(url, reach));
+    checkChallenge(response);
+    if (response.status >= 300 && response.status < 400 && response.location) {
+      url = publicUrl(new URL(response.location, url).href);
+      continue;
+    }
+    if (response.status >= 200 && response.status < 300)
+      return robotsRules(response.body.subarray(0, 512 * 1024).toString("utf8"));
+    if (response.status >= 400 && response.status < 500 && response.status !== 429) return [];
+    break;
+  }
+  throw new Error("Unavailable robots.txt");
+}
+
+function rulesFor(url: URL, reach: Reach): Promise<Rules> {
+  const key = `${reach} ${url.origin}`;
+  const cached = policies.get(key);
+  if (cached && cached.expires > Date.now()) return cached.result;
+  policies.delete(key);
+  if (policies.size >= 512) policies.delete(policies.keys().next().value!);
+  const entry = {
+    expires: Date.now() + 3600000,
+    result: loadRules(url.origin, reach).catch((error: unknown) => {
+      entry.expires = Date.now() + 30000;
+      if (error instanceof GenerateError && error.code === "bot-check") throw error;
+      throw new GenerateError(
+        `FencePost couldn't read robots.txt for ${url.host}. Try again shortly.`,
+        503,
+        "robots-unavailable",
+      );
+    }),
+  };
+  policies.set(key, entry);
+  return entry.result;
+}
+
+// Fetches over the address it checked, so a second lookup can't switch to a
+// private one. allow, when given, has to pass for the address and for each
+// redirect. robots checks the site's robots.txt rules first; it's on for
+// public fetches and off for local ones, which capture a site before it's
+// published.
+export async function publicFetch(
+  input: string,
+  allow?: (host: string) => boolean,
+  redirects = 0,
+  // The page asking for it, passed on as the browser would: some embeds, such
+  // as YouTube's player, refuse to play without it
+  referer?: string,
+  reach: Reach = "public",
+  robots = reach === "public",
+): Promise<Fetched> {
+  const url = publicUrl(input);
+  if (allow && !allow(url.hostname))
+    throw new GenerateError(
+      "FencePost works only with Carnegie Mellon sites. To add yours, use the Request a Domain form on the Reference page.",
+      403,
+    );
+  // Resolve before policy lookup so private addresses retain their usual error
+  const address = await resolveHost(url, reach);
+  if (robots) checkRobots(url, await rulesFor(url, reach));
+  const result = await requestUrl(url, address, referer);
+  if (result.status >= 300 && result.status < 400 && result.location) {
+    if (redirects >= 5) throw new GenerateError("The site redirects too many times.");
+    return publicFetch(
+      new URL(result.location, url).href,
+      allow,
+      redirects + 1,
+      referer,
+      reach,
+      robots,
+    );
+  }
+  checkChallenge(result);
   if (result.status >= 400) {
     const answer = `The address returned ${result.status} ${STATUS_CODES[result.status] || "Error"}.`;
     throw new GenerateError(
@@ -290,7 +358,8 @@ export function checkDelay(value: unknown): number {
 
 // Screenshots the top of a public page, signed out, at a link preview's size
 // unless given another. The browser has no network of its own: every request
-// goes through publicFetch.
+// goes through publicFetch. robots.txt applies to the page, not to the files
+// it loads, as for a browser showing the page.
 export async function capturePage(
   input: string,
   allow: (host: string) => boolean,
@@ -314,7 +383,12 @@ export async function capturePage(
       args: ["--force-webrtc-ip-handling-policy=disable_non_proxied_udp"],
     });
     try {
+      // Chromium's own user agent, so page scripts see a browser, plus FencePost's
+      const session = await browser.newBrowserCDPSession();
+      const { userAgent } = await session.send("Browser.getVersion");
+      await session.detach();
       const context = await browser.newContext({
+        userAgent: `${userAgent} ${USER_AGENT}`,
         viewport: size,
         deviceScaleFactor: scale,
         serviceWorkers: "block",
@@ -339,9 +413,9 @@ export async function capturePage(
           const resource =
             url === page0.url
               ? page0
-              : await publicFetch(url, undefined, 0, referer, reach).catch((e: unknown) => {
+              : await publicFetch(url, undefined, 0, referer, reach, false).catch((e: unknown) => {
                   if (e instanceof GenerateError) throw e;
-                  return publicFetch(url, undefined, 0, referer, reach);
+                  return publicFetch(url, undefined, 0, referer, reach, false);
                 });
           await route.fulfill({ status: 200, contentType: resource.type, body: resource.body });
         } catch (e) {

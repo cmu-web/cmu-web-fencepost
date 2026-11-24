@@ -107,6 +107,7 @@
               <ul>
                 <li><a href="#workflow-action">Workflow Action</a></li>
                 <li><a href="#errors">Errors</a></li>
+                <li><a href="#site-owners">For Site Owners</a></li>
                 <li><a href="#cloudflare">Sites Behind Cloudflare</a></li>
               </ul>
             </div>
@@ -638,8 +639,13 @@
                   ></tr
                 >
                 <tr
-                  ><th scope="row">403</th><td>The site isn't one FencePost captures.</td
-                  ><td>See <a href="#sites">Approved Sites</a>.</td></tr
+                  ><th scope="row">403</th><td>FencePost can't fetch this address.</td
+                  ><td
+                    >For <code>robots-disallowed</code>, check the site's
+                    <code>robots.txt</code> rules for FencePost; see
+                    <a href="#site-owners">For Site Owners</a>. Otherwise see
+                    <a href="#sites">Approved Sites</a>.</td
+                  ></tr
                 >
                 <tr
                   ><th scope="row">429</th><td>Two captures are already running.</td
@@ -651,6 +657,14 @@
                     >The page itself; a 401 or 403 from it means a sign-in, so upload a screenshot
                     instead. A response with <code>"code": "bot-check"</code> is a Cloudflare bot
                     check; see <a href="#cloudflare">Sites Behind Cloudflare</a>.</td
+                  ></tr
+                >
+                <tr
+                  ><th scope="row">503</th
+                  ><td>FencePost couldn't look up the site or read its rules.</td
+                  ><td
+                    >For <code>robots-unavailable</code>, check whether the site can serve
+                    <code>/robots.txt</code> and try again.</td
                   ></tr
                 >
                 <tr
@@ -672,6 +686,15 @@
             <p>
               Every error is JSON with an <code>error</code> message written for the person using
               the page, so it can be shown as is.
+            </p>
+            <h2 id="site-owners" class="rule-top">For Site Owners</h2>
+            <p>
+              FencePost identifies its requests as <code>FencePost/1.0</code> and follows your
+              site's <code>robots.txt</code>. To set rules for it alone, use
+              <code>User-agent: FencePost</code>; otherwise it follows the rules for <code>*</code>.
+              The rules cover the page and any image someone names for a preview, not the styles,
+              scripts and images the page loads. The command line and the GitHub Action skip them,
+              since they capture a site from its own build.
             </p>
             <h2 id="cloudflare" class="rule-top">Sites Behind Cloudflare</h2>
             <p>

@@ -99,7 +99,13 @@ export async function makePreview(
       const { tags, title: htmlTitle } = readTags(page.body.toString("utf8"));
       title = tags.get("og:title")?.[0] || htmlTitle;
       description = tags.get("og:description")?.[0] || tags.get("description")?.[0] || "";
-    } catch {
+    } catch (error) {
+      if (!req.title?.trim() && error instanceof GenerateError && error.code?.startsWith("robots-"))
+        throw new GenerateError(
+          `${error.message} Enter a title to use the linked image.`,
+          error.status,
+          error.code,
+        );
       if (!req.title?.trim())
         throw new GenerateError("FencePost couldn't read the page, so give it a title.");
     }

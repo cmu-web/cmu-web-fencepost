@@ -201,7 +201,7 @@
       byId("fp-result-title").focus();
     } catch (error) {
       showPlaceholder();
-      if (error.status === 403) notCaptured();
+      if (error.status === 403 && !error.code) notCaptured();
       else if (error.code === "bot-check") botCheck();
       else message(error.message, "error");
     } finally {
