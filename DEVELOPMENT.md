@@ -15,11 +15,11 @@ Use the Node version in [the Dockerfile](Dockerfile), then, from the
 checkout:
 
 ```bash
-npm ci
-npm run dev
+make setup
+make run
 ```
 
-It serves FencePost at http://localhost:3000/ and restarts when `src/`
+It serves FencePost at http://127.0.0.1:3400/ and restarts when `src/`
 changes. Taking a screenshot uses Playwright's Chromium, installed as the
 setup page describes; the container image includes its own.
 
@@ -39,25 +39,26 @@ server keep the public-only rule, and the tests check it.
 
 ### Preview a Web Kilt Change
 
-To see an unreleased Web Kilt change in FencePost, run `npm run dev`, then
-`npm run preview:kilt` in a second terminal and open http://127.0.0.1:4100/.
+To see an unreleased Web Kilt change in FencePost, run `make run`, then
+`npm run preview:kilt` in a second terminal and open http://127.0.0.1:3401/.
 It puts the Web Kilt's preview proxy in front of FencePost, with the pages'
 Kilt links pointed at the checkout beside this one (`../cmu-web-kilt`, or
 set `KILT_DIR`). FencePost itself is unchanged and still shows the pinned
-release at http://localhost:3000/.
+release at http://127.0.0.1:3400/.
 
 ## Check a Change
 
-The everyday check is `npm run check`: it needs nothing beyond `npm ci` and
-no network access. It checks the Node version, ESLint, Prettier and
-TypeScript, runs the tests, and checks that the Approved Sites table, the
-WordPress plugin and the action match `package.json` and `domains.json`. The
-tests don't start a browser. The Publish Image workflow runs the same check
-in the Dockerfile's `test` stage; to run it that way, use
-`docker build --target test .` (Podman takes the same command).
+The everyday check is `make check` (`npm run check`): it needs nothing
+beyond `make setup` and no network access. It checks the Node version,
+ESLint, Prettier and TypeScript, runs the tests, and checks that the
+Approved Sites table, the WordPress plugin and the action match
+`package.json` and `domains.json`. The tests don't start a browser. The
+Publish Image workflow runs the same check in the Dockerfile's `test` stage;
+to run it that way, use `docker build --target test .` (Podman takes the
+same command).
 
-After changing `domains.json`, run `npm run docs` to update the Approved
-Sites table on the Reference page; `npm run check` fails until it matches.
+After changing `domains.json`, run `make docs` to update the Approved
+Sites table on the Reference page; `make check` fails until it matches.
 Contacts for each group are kept privately, never in the repository.
 
 The Test Action workflow also builds the container image on every push and
@@ -97,7 +98,7 @@ this list. Checked 2026-11-16.
    `npm version 0.2.0 --no-git-tag-version`), the WordPress plugin's
    `Version` header and its `readme.txt` Stable tag, and the
    `RELEASE_IMAGE:` line in `action.yml`, which runs the release's container
-   image. `npm run check` fails until all of them match.
+   image. `make check` fails until all of them match.
 2. Commit (`chore: release 0.2.0`), tag the commit (e.g., `0.2.0`, with no
    `v`) and push `main` and the tag together.
 3. Create the tag's GitHub release with its notes. The Publish Image workflow

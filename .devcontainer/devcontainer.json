@@ -14,11 +14,12 @@
   "remoteUser": "node",
   "updateRemoteUserUID": true,
   "containerEnv": {
-    "NODE_ENV": "development"
+    "NODE_ENV": "development",
+    "PORT": "3400"
   },
-  "forwardPorts": [3000],
+  "forwardPorts": [3400],
   "portsAttributes": {
-    "3000": {
+    "3400": {
       "label": "FencePost",
       "onAutoForward": "notify"
     }
